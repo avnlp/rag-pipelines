@@ -1,14 +1,14 @@
-import os
 from typing import Any, Dict
 
 from haystack import Document, Pipeline
 from haystack.components.builders.answer_builder import AnswerBuilder
 from haystack.components.builders.prompt_builder import PromptBuilder
 from haystack.components.generators import HuggingFaceLocalGenerator
-from haystack.components.rankers import DiversityRanker
-from instructor_embedders import InstructorTextEmbedder
-from pinecone_haystack import PineconeDocumentStore
-from pinecone_haystack.dense_retriever import PineconeDenseRetriever
+from haystack.components.rankers import SentenceTransformersDiversityRanker
+from haystack.utils import Secret
+from haystack_integrations.components.embedders.instructor_embedders import InstructorTextEmbedder
+from haystack_integrations.components.retrievers.pinecone import PineconeEmbeddingRetriever
+from haystack_integrations.document_stores.pinecone import PineconeDocumentStore
 from tqdm import tqdm
 
 from rag_pipelines import BeirDataloader
@@ -36,7 +36,7 @@ documents_corp = [
 ]
 
 dense_document_store = PineconeDocumentStore(
-    api_key=os.getenv("PINECONE_API_KEY"),
+    api_key=Secret.from_env_var("PINECONE_API_KEY"),
     environment="gcp-starter",
     index="fiqa",
     namespace="default",
@@ -44,15 +44,11 @@ dense_document_store = PineconeDocumentStore(
 )
 
 
-dense_retriever = PineconeDenseRetriever(document_store=dense_document_store, top_k=10)
+dense_retriever = PineconeEmbeddingRetriever(document_store=dense_document_store, top_k=10)
 query_instruction = "Represent the financial question for retrieving supporting documents:"
-text_embedder = InstructorTextEmbedder(
-    model_name_or_path="hkunlp/instructor-xl",
-    instruction=query_instruction,
-    device="cuda",
-)
+text_embedder = InstructorTextEmbedder(model="hkunlp/instructor-xl", instruction=query_instruction)
 
-diversity_ranker = DiversityRanker(model_name_or_path="cross-encoder/ms-marco-MiniLM-L-12-v2", device="cuda", top_k=10)
+diversity_ranker = SentenceTransformersDiversityRanker(model="cross-encoder/ms-marco-MiniLM-L-12-v2", top_k=10)
 
 dense_pipeline = Pipeline()
 dense_pipeline.add_component(
