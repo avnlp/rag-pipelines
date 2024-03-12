@@ -1,9 +1,8 @@
-import os
-
 from haystack import Document, Pipeline
 from haystack.components.embedders import SentenceTransformersDocumentEmbedder
 from haystack.components.writers import DocumentWriter
-from pinecone_haystack import PineconeDocumentStore
+from haystack.utils import Secret
+from haystack_integrations.document_stores.pinecone import PineconeDocumentStore
 
 from rag_pipelines import BeirDataloader
 
@@ -21,16 +20,14 @@ documents = [
 ]
 
 document_store = PineconeDocumentStore(
-    api_key=os.getenv("PINECONE_API_KEY"),
+    api_key=Secret.from_env_var("PINECONE_API_KEY"),
     environment="gcp-starter",
     index="fiqa",
     namespace="default",
     dimension=768,
 )
 
-embedder = SentenceTransformersDocumentEmbedder(
-    model_name_or_path="sentence-transformers/all-mpnet-base-v2", device="cuda"
-)
+embedder = SentenceTransformersDocumentEmbedder(model="sentence-transformers/all-mpnet-base-v2")
 embedder.warm_up()
 
 indexing_pipeline = Pipeline()

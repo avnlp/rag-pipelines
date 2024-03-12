@@ -35,12 +35,11 @@ classifiers = [
 
 dependencies = [
   "typing_extensions",
-  "haystack-ai @ git+https://github.com/awinml/haystack.git@test_rrf#egg=haystack-ai",
-  "instructor-embedders-haystack==0.1.0",
-  "pinecone-client==2.2.4",
-  "pinecone-haystack==0.0.1",
+  "haystack-ai @ git+https://github.com/deepset-ai/haystack.git@main#egg=haystack-ai",
+  "instructor-embedders-haystack",
+  "pinecone-haystack",
   "beir",
-  "sentence-transformers==2.2.2"
+  "sentence-transformers",
 ]
 
 [project.urls]
@@ -55,48 +54,25 @@ packages = ["src/rag_pipelines"]
 path = "src/rag_pipelines/__about__.py"
 
 [tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "coveralls",
-  "pytest",
-]
+dependencies = ["coverage[toml]>=6.5", "coveralls", "pytest"]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage xml",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
+cov-report = ["- coverage combine", "coverage xml"]
+cov = ["test-cov", "cov-report"]
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.lint]
 detached = true
-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-]
+dependencies = ["black>=23.1.0", "mypy>=1.0.0", "ruff>=0.0.243"]
+
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:src/rag_pipelines tests}"
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-fmt = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "fmt",
-  "typing",
-]
+style = ["ruff check {args:.}", "black --check --diff {args:.}"]
+fmt = ["black {args:.}", "ruff check --fix {args:.}", "style"]
+all = ["fmt", "typing"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -109,7 +85,7 @@ skip-string-normalization = true
 [tool.ruff]
 target-version = "py37"
 line-length = 120
-select = [
+lint.select = [
   "A",
   "ARG",
   "B",
@@ -136,30 +112,36 @@ select = [
   "W",
   "YTT",
 ]
-ignore = [
+lint.ignore = [
   # Allow non-abstract empty methods in abstract base classes
   "B027",
   # Allow boolean positional values in function calls, like `dict.get(... True)`
   "FBT003",
   # Ignore checks for possible passwords
-  "S105", "S106", "S107",
+  "S105",
+  "S106",
+  "S107",
   # Ignore complexity
-  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
   # Ignore print statements
-  "T201"
+  "T201",
 ]
-unfixable = [
+lint.unfixable = [
   # Don't touch unused imports
   "F401",
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["rag_pipelines"]
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
@@ -167,36 +149,23 @@ ban-relative-imports = "all"
 source_pkgs = ["rag_pipelines", "tests"]
 branch = true
 parallel = true
-omit = [
-  "src/rag_pipelines/__about__.py",
-  "examples"
-]
+omit = ["src/rag_pipelines/__about__.py", "examples"]
 
 [tool.coverage.paths]
 rag_pipelines = ["src/rag_pipelines", "*/rag_pipelines/src/rag_pipelines"]
 tests = ["tests", "*rag_pipelines/tests"]
 
 [tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-vv"
-markers = [
-  "unit: unit tests",
-  "integration: integration tests"
-]
+markers = ["unit: unit tests", "integration: integration tests"]
 
 [tool.mypy]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = [
-  "haystack.*",
-  "pytest.*"
-]
+module = ["haystack.*", "pytest.*"]
 ignore_missing_imports = true

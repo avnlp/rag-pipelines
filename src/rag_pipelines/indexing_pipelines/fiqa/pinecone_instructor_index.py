@@ -1,9 +1,8 @@
-import os
-
 from haystack import Document, Pipeline
 from haystack.components.writers import DocumentWriter
-from instructor_embedders.instructor_document_embedder import InstructorDocumentEmbedder
-from pinecone_haystack import PineconeDocumentStore
+from haystack.utils import Secret
+from haystack_integrations.components.embedders.instructor_embedders import InstructorDocumentEmbedder
+from haystack_integrations.document_stores.pinecone import PineconeDocumentStore
 
 from rag_pipelines import BeirDataloader
 
@@ -21,7 +20,7 @@ documents = [
 ]
 
 document_store = PineconeDocumentStore(
-    api_key=os.getenv("PINECONE_API_KEY"),
+    api_key=Secret.from_env_var("PINECONE_API_KEY"),
     environment="gcp-starter",
     index="fiqa",
     namespace="default",
@@ -30,9 +29,7 @@ document_store = PineconeDocumentStore(
 
 doc_instruction = "Represent the financial document for retrieval:"
 
-embedder = InstructorDocumentEmbedder(
-    model_name_or_path="hkunlp/instructor-xl", instruction=doc_instruction, device="cuda"
-)
+embedder = InstructorDocumentEmbedder(model="hkunlp/instructor-xl", instruction=doc_instruction)
 embedder.warm_up()
 
 indexing_pipeline = Pipeline()

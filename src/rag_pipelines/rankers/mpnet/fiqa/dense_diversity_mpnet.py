@@ -1,10 +1,9 @@
-import os
-
 from haystack import Document, Pipeline
 from haystack.components.embedders import SentenceTransformersTextEmbedder
-from haystack.components.rankers import DiversityRanker
-from pinecone_haystack import PineconeDocumentStore
-from pinecone_haystack.dense_retriever import PineconeDenseRetriever
+from haystack.components.rankers import SentenceTransformersDiversityRanker
+from haystack.utils import Secret
+from haystack_integrations.components.retrievers.pinecone import PineconeEmbeddingRetriever
+from haystack_integrations.document_stores.pinecone import PineconeDocumentStore
 from tqdm import tqdm
 
 from rag_pipelines import BeirDataloader, BeirEvaluator
@@ -24,20 +23,20 @@ documents_corp = [
 
 
 dense_document_store = PineconeDocumentStore(
-    api_key=os.getenv("PINECONE_API_KEY"),
+    api_key=Secret.from_env_var("PINECONE_API_KEY"),
     environment="gcp-starter",
     index="fiqa",
     namespace="default",
     dimension=768,
 )
 
-dense_retriever = PineconeDenseRetriever(document_store=dense_document_store, top_k=10)
+dense_retriever = PineconeEmbeddingRetriever(document_store=dense_document_store, top_k=10)
 text_embedder = SentenceTransformersTextEmbedder(
-    model_name_or_path="all-mpnet-base-v2",
-    device="cuda",
+    model="sentence-transformers/all-mpnet-base-v2",
 )
-diversity_ranker = DiversityRanker(model_name_or_path="cross-encoder/ms-marco-MiniLM-L-12-v2", device="cuda", top_k=10)
+diversity_ranker = SentenceTransformersDiversityRanker(model="cross-encoder/ms-marco-MiniLM-L-12-v2", top_k=10)
 dense_pipeline = Pipeline()
+dense_pipeline.add_component(instance=text_embedder, name="text_embedder")
 dense_pipeline.add_component(instance=dense_retriever, name="embedding_retriever")
 dense_pipeline.add_component(instance=diversity_ranker, name="diversity_ranker")
 

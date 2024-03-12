@@ -1,9 +1,8 @@
-import os
-
 from haystack import Document, Pipeline
-from instructor_embedders.instructor_text_embedder import InstructorTextEmbedder
-from pinecone_haystack import PineconeDocumentStore
-from pinecone_haystack.dense_retriever import PineconeDenseRetriever
+from haystack.utils import Secret
+from haystack_integrations.components.embedders.instructor_embedders import InstructorTextEmbedder
+from haystack_integrations.components.retrievers.pinecone import PineconeEmbeddingRetriever
+from haystack_integrations.document_stores.pinecone import PineconeDocumentStore
 from tqdm import tqdm
 
 from rag_pipelines import BeirDataloader, BeirEvaluator
@@ -23,19 +22,18 @@ documents_corp = [
 
 
 dense_document_store = PineconeDocumentStore(
-    api_key=os.getenv("PINECONE_API_KEY"),
+    api_key=Secret.from_env_var("PINECONE_API_KEY"),
     environment="gcp-starter",
     index="fiqa",
     namespace="default",
     dimension=768,
 )
 
-dense_retriever = PineconeDenseRetriever(document_store=dense_document_store, top_k=10)
+dense_retriever = PineconeEmbeddingRetriever(document_store=dense_document_store, top_k=10)
 query_instruction = "Represent the financial question for retrieving supporting documents:"
 text_embedder = InstructorTextEmbedder(
-    model_name_or_path="hkunlp/instructor-xl",
+    model="hkunlp/instructor-xl",
     instruction=query_instruction,
-    device="cuda",
 )
 
 dense_pipeline = Pipeline()
