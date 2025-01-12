@@ -1,0 +1,176 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rag-pipelines"
+version = "0.0.1"
+description = 'Advanced Retrieval Augmented Generation Pipelines'
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Ashwin Mathur", email = "" },
+  { name = "Varun Mathur", email = "" },
+]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "dataloaders @ git+https://github.com/avnlp/dataloaders.git",
+  "langchain-core",
+  "langchain-text-splitters",
+  "langchain-experimental",
+  "langchain-huggingface",
+  "langchain-groq",
+  "haystack-ai",
+  "weave",
+  "edgartools",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Documentation = "https://github.com/avnlp/rag-pipelines#readme"
+Issues = "https://github.com/avnlp/rag-pipelines/issues"
+Source = "https://github.com/avnlp/rag-pipelines"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag_pipelines"]
+
+[tool.hatch.envs.default]
+installer = "uv"
+dependencies = ["coverage[toml]>=6.5", "pytest", "pytest-rerunfailures"]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+test-cov-retry = "test-cov --reruns 3 --reruns-delay 30 -x"
+cov-report = ["- coverage combine", "coverage report"]
+cov = ["test-cov", "cov-report"]
+cov-retry = ["test-cov-retry", "cov-report"]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["39", "310", "311"]
+
+[tool.hatch.envs.lint]
+installer = "uv"
+detached = true
+dependencies = ["pip", "black>=23.1.0", "mypy>=1.0.0", "ruff>=0.0.243"]
+
+[tool.hatch.envs.lint.scripts]
+typing = "mypy --install-types --non-interactive --explicit-package-bases {args:src/ tests}"
+style = ["ruff check {args:}", "black --check --diff {args:.}"]
+fmt = ["black {args:.}", "ruff check --fix --unsafe-fixes {args:}", "style"]
+all = ["style", "typing"]
+
+[tool.coverage.run]
+source = ["rag_pipelines"]
+branch = true
+parallel = true
+
+[tool.coverage.report]
+omit = ["*/tests/*", "*/__init__.py"]
+show_missing = true
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "D",
+  "D401",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105",
+  "S106",
+  "S107",
+  # Ignore complexity
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+  # Allow print statements
+  "T201",
+  # Ignore missing module docstrings
+  "D100",
+  "D104",
+  # Ignore Line too long
+  "E501",
+  # Ignore builtin argument shadowing
+  "A002",
+]
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["rag_pipelines"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers"
+markers = ["integration: integration tests"]
+log_cli = true
+
+[tool.black]
+line-length = 120
+
+[[tool.mypy.overrides]]
+module = ["rag_pipelines.*", "pytest.*", "numpy.*"]
+ignore_missing_imports = true
