@@ -31,9 +31,18 @@ dependencies = [
   "langchain-experimental",
   "langchain-huggingface",
   "langchain-groq",
+  "langchain_milvus",
+  "langchain-weaviate",
+  "langchain-pinecone",
   "haystack-ai",
   "weave",
   "edgartools",
+  "fastembed",
+  "pinecone-text[splade]",
+  "unstructured[pdf]",
+  "deepeval",
+  "arize-phoenix",
+  "dspy",
 ]
 
 [project.optional-dependencies]
@@ -143,6 +152,10 @@ ignore = [
   "E501",
   # Ignore builtin argument shadowing
   "A002",
+  # Ignore builtin module shadowing
+  "A005",
+  # Ignore Function calls in argument defaults
+  "B008",
 ]
 unfixable = [
   # Don't touch unused imports
