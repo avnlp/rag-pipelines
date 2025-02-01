@@ -1,6 +1,6 @@
 import argparse
 
-from dataloaders import (
+from dataloaders.langchain import (
     ARCDataloader,
     EdgarDataLoader,
     FactScoreDataloader,
@@ -249,8 +249,8 @@ def main():
     scorers = []
     for scorer_name in args.scorers:
         if scorer_name in SCORER_CLASSES:
-            ScorerClass = SCORER_CLASSES[scorer_name]
-            scorer = ScorerClass(
+            scorer_class = SCORER_CLASSES[scorer_name]
+            scorer = scorer_class(
                 threshold=args.threshold,
                 model=args.model,
                 include_reason=args.include_reason,
