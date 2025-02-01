@@ -37,7 +37,7 @@ class RAGPipeline(Model):
     tracer: Optional[WeaveTracer] = None
 
     def __init__(self, retriever, prompt, llm, tracing_project_name="hybrid_rag", weave_params=None):
-        """Initializes the HybridRAGPipeline.
+        """Initialize the HybridRAGPipeline.
 
         This constructor sets up the retriever, prompt, LLM, and integrates Weave tracing if specified.
 
@@ -49,8 +49,6 @@ class RAGPipeline(Model):
             weave_params (dict): Additional parameters for initializing Weave. This can include configuration
                                     details or authentication settings for the Weave service.
         """
-        if weave_params is None:
-            weave_params = {}
         super().__init__(
             retriever=retriever,
             prompt=prompt,
@@ -58,6 +56,9 @@ class RAGPipeline(Model):
             tracing_project_name=tracing_project_name,
             weave_params=weave_params,
         )
+
+        if weave_params is None:
+            weave_params = {}
 
         self.retriever = retriever
         self.prompt = prompt
@@ -71,7 +72,7 @@ class RAGPipeline(Model):
             self._initialize_weave()
 
     def _initialize_weave(self, **weave_params):
-        """Initializes Weave with the specified tracing project name.
+        """Initialize Weave with the specified tracing project name.
 
         This method sets up the Weave environment and creates an instance of the WeaveTracer.
         The tracer records the execution of each step in the RAG pipeline for monitoring and debugging purposes.
@@ -83,7 +84,7 @@ class RAGPipeline(Model):
 
     @weave.op()
     def predict(self, question: str) -> str:
-        """Executes the Hybrid RAG pipeline with the given question.
+        """Execute the Hybrid RAG pipeline with the given question.
 
         This method orchestrates the entire RAG pipeline. It first retrieves documents using the retriever,
         formats them, generates a question using the prompt template, and then processes the final response
@@ -113,7 +114,7 @@ class RAGPipeline(Model):
         return rag_chain.invoke(question, config=config)
 
     def format_docs(self, docs):
-        """Formats retrieved documents into a string for input to the LLM.
+        """Format retrieved documents into a string for input to the LLM.
 
         The documents are formatted with information such as filing date, accession number, summary, and image
         descriptions.

@@ -78,7 +78,7 @@ class SelfRAGPipeline(Model):
         tracing_project_name: str = "self_reflective_rag",
         weave_params: Optional[dict[str, Any]] = None,
     ):
-        """Initializes the HybridSelfRAGPipeline.
+        """Initialize the HybridSelfRAGPipeline.
 
         Args:
         -----
@@ -123,7 +123,7 @@ class SelfRAGPipeline(Model):
         self._initialize_weave(**(weave_params or {}))
 
     def _initialize_weave(self, **weave_params) -> None:
-        """Initializes Weave with the specified tracing project name.
+        """Initialize Weave with the specified tracing project name.
 
         Sets up the Weave environment and creates a tracer for monitoring pipeline execution.
 
@@ -136,7 +136,7 @@ class SelfRAGPipeline(Model):
         self.tracer = WeaveTracer()
 
     def _build_self_rag_graph(self) -> CompiledStateGraph:
-        """Builds and compiles the self-reflective RAG workflow graph.
+        """Build and  the self-reflective RAG workflow graph.
 
         The graph defines the flow between components like retrieval, grading, query transformation,
         web search, and generation.
@@ -176,7 +176,7 @@ class SelfRAGPipeline(Model):
 
     @weave.op()
     def predict(self, question: str) -> str:
-        """Executes the self-reflective RAG pipeline with the given question.
+        """Execute the self-reflective RAG pipeline with the given question.
 
         The pipeline retrieves documents, evaluates and grades their relevance, and generates a final response
         using the LLM.
