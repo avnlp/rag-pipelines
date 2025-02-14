@@ -27,6 +27,7 @@ classifiers = [
 dependencies = [
   "dataloaders @ git+https://github.com/avnlp/dataloaders.git",
   "langchain-core",
+  "langgraph",
   "langchain-text-splitters",
   "langchain-experimental",
   "langchain-huggingface",
