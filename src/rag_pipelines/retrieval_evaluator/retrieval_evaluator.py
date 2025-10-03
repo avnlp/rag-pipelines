@@ -41,7 +41,9 @@ class RetrievalEvaluator:
         )
         self.chain = self.prompt | self.llm | JsonOutputParser()
 
-    def score_documents(self, question: str, documents: list[Any]) -> list[dict[str, Any]]:
+    def score_documents(
+        self, question: str, documents: list[Any]
+    ) -> list[dict[str, Any]]:
         """Score the relevance of each document with respect to the given user question.
 
         This method evaluates the relevance of each document by passing the user question and the document's content
@@ -62,7 +64,7 @@ class RetrievalEvaluator:
             question = "What are the benefits of cloud computing?"
             documents = [
                 Document(page_content="Cloud computing provides scalability."),
-                Document(page_content="It is raining outside.")
+                Document(page_content="It is raining outside."),
             ]
             results = evaluator.score_documents(question, documents)
             print(results)

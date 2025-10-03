@@ -3,6 +3,7 @@ from typing import Any
 
 from rag_pipelines.utils import LoggerFactory
 
+
 logger_factory = LoggerFactory(logger_name=__name__, log_level=logging.INFO)
 logger = logger_factory.get_logger()
 
@@ -45,7 +46,7 @@ class QueryDecisionMaker:
             state = {
                 "question": "What is the capital of France?",
                 "web_search": "Yes",
-                "documents": []
+                "documents": [],
             }
             decision_maker = QueryDecisionMaker()
             next_step = decision_maker(state)
@@ -57,9 +58,10 @@ class QueryDecisionMaker:
 
         if web_search == "Yes":
             # All documents have been filtered as irrelevant
-            logger.info("DECISION: DOCUMENTS ARE NOT RELEVANT TO QUESTION, TRANSFORM QUERY")
+            logger.info(
+                "DECISION: DOCUMENTS ARE NOT RELEVANT TO QUESTION, TRANSFORM QUERY"
+            )
             return "transform_query"
-        else:
-            # Relevant documents are available, proceed to generate the answer
-            logger.info("DECISION: GENERATE")
-            return "generate"
+        # Relevant documents are available, proceed to generate the answer
+        logger.info("DECISION: GENERATE")
+        return "generate"

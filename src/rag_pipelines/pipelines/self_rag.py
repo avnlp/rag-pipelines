@@ -15,6 +15,7 @@ from rag_pipelines.query_transformer import QueryTransformer
 from rag_pipelines.retrieval_evaluator import DocumentGrader, QueryDecisionMaker
 from rag_pipelines.websearch import WebSearch
 
+
 # Disable global tracing explicitly
 os.environ["WEAVE_TRACE_LANGCHAIN"] = "false"
 

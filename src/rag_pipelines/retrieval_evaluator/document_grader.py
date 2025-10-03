@@ -55,7 +55,9 @@ class DocumentGrader:
             print(results["run_web_search"])  # Output: 'Yes' or 'No'
             ```
         """
-        scored_documents = self.retrieval_evaluator.score_documents(question=question, documents=documents)
+        scored_documents = self.retrieval_evaluator.score_documents(
+            question=question, documents=documents
+        )
 
         relevant_docs = []
         relevant_count = 0
@@ -66,7 +68,9 @@ class DocumentGrader:
                 relevant_count += 1
 
         # Calculate relevance ratio
-        relevance_ratio = relevant_count / len(scored_documents) if scored_documents else 0
+        relevance_ratio = (
+            relevant_count / len(scored_documents) if scored_documents else 0
+        )
 
         # Determine if a web search is needed
         run_web_search = "Yes" if relevance_ratio <= self.threshold else "No"
@@ -92,10 +96,7 @@ class DocumentGrader:
 
         Example:
             ```python
-            state = {
-                "question": "What is the capital of France?",
-                "documents": [...]
-            }
+            state = {"question": "What is the capital of France?", "documents": [...]}
             updated_state = grader(state)
             print(updated_state["web_search"])  # Output: 'Yes' or 'No'
             ```

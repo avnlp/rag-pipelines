@@ -10,6 +10,7 @@ from pymilvus import (
 
 from rag_pipelines.embeddings.sparse_fastembed_milvus import SparseEmbeddings
 
+
 TEXT_FIELD = "text"
 DENSE_FIELD = "dense_vector"
 SPARSE_FIELD = "sparse_vector"
@@ -71,7 +72,10 @@ class MilvusRetriever(weave.Model):
         )
 
         if field_search_params is None:
-            field_search_params = [{"metric_type": "IP"}, {"metric_type": "IP", "params": {}}]
+            field_search_params = [
+                {"metric_type": "IP"},
+                {"metric_type": "IP", "params": {}},
+            ]
         if anns_fields is None:
             anns_fields = [DENSE_FIELD, SPARSE_FIELD]
 

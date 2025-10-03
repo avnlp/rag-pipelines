@@ -10,6 +10,7 @@ from langchain_groq import ChatGroq
 from weave import Model
 from weave.integrations.langchain import WeaveTracer
 
+
 # Disable global tracing explicitly
 os.environ["WEAVE_TRACE_LANGCHAIN"] = "false"
 
@@ -36,7 +37,14 @@ class RAGPipeline(Model):
     weave_params: dict[str, Any]
     tracer: Optional[WeaveTracer] = None
 
-    def __init__(self, retriever, prompt, llm, tracing_project_name="hybrid_rag", weave_params=None):
+    def __init__(
+        self,
+        retriever,
+        prompt,
+        llm,
+        tracing_project_name="hybrid_rag",
+        weave_params=None,
+    ):
         """Initialize the HybridRAGPipeline.
 
         This constructor sets up the retriever, prompt, LLM, and integrates Weave tracing if specified.

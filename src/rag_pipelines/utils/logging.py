@@ -63,7 +63,9 @@ class LoggerFactory:
         return self.logger
 
     @staticmethod
-    def configure_from_env(logger_name: str, env_var: str = "LOG_LEVEL") -> "LoggerFactory":
+    def configure_from_env(
+        logger_name: str, env_var: str = "LOG_LEVEL"
+    ) -> "LoggerFactory":
         """Configure the logger based on an environment variable for dynamic log level setting.
 
         Args:

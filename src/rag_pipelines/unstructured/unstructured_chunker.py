@@ -22,8 +22,7 @@ chunker = UnstructuredChunker()
 documents = [...]
 
 # Chunk the documents using the "basic" strategy
-chunked_documents = chunker.transform_documents(documents)
-"""
+chunked_documents = chunker.transform_documents(documents)"""
 
 import logging
 from typing import Any, Literal, Optional
@@ -35,6 +34,7 @@ from unstructured.chunking.title import chunk_by_title
 from unstructured.documents.elements import Element, NarrativeText
 
 from rag_pipelines.utils import LoggerFactory
+
 
 # Initialize logger
 logger_factory = LoggerFactory(logger_name=__name__, log_level=logging.INFO)
@@ -147,7 +147,9 @@ class UnstructuredChunker(weave.Model):
 
         return elements, element_metadatas
 
-    def _convert_chunked_elements_to_documents(self, elements: list[Element]) -> list[Document]:
+    def _convert_chunked_elements_to_documents(
+        self, elements: list[Element]
+    ) -> list[Document]:
         """Convert a list of chunked unstructured elements back to LangChain documents.
 
         Args:
@@ -158,7 +160,9 @@ class UnstructuredChunker(weave.Model):
         """
         documents = []
         for element in elements:
-            document = Document(page_content=element.text, metadata=element.metadata.to_dict())
+            document = Document(
+                page_content=element.text, metadata=element.metadata.to_dict()
+            )
             documents.append(document)
         logger.debug(f"Converted {len(elements)} chunked elements to documents.")
         return documents
@@ -180,7 +184,9 @@ class UnstructuredChunker(weave.Model):
             logger.error(msg)
             raise ValueError(msg)
 
-        logger.info(f"Transforming {len(documents)} documents using strategy: {self.chunking_strategy}")
+        logger.info(
+            f"Transforming {len(documents)} documents using strategy: {self.chunking_strategy}"
+        )
 
         all_chunked_documents = []
 
@@ -223,5 +229,7 @@ class UnstructuredChunker(weave.Model):
                 chunked_document = Document(page_content=chunk.text, metadata=metadata)
                 all_chunked_documents.append(chunked_document)
 
-        logger.info(f"Combined all chunked documents into {len(all_chunked_documents)} documents.")
+        logger.info(
+            f"Combined all chunked documents into {len(all_chunked_documents)} documents."
+        )
         return all_chunked_documents

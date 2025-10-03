@@ -83,7 +83,9 @@ class ChatGroqGenerator(weave.Model):
         """
         content = []
         for prompt in prompts:
-            if prompt.startswith("data:image/png;base64,") or prompt.startswith("data:image/jpeg;base64,"):
+            if prompt.startswith("data:image/png;base64,") or prompt.startswith(
+                "data:image/jpeg;base64,"
+            ):
                 content.append(
                     {
                         "type": "image_url",
@@ -114,7 +116,9 @@ class ChatGroqGenerator(weave.Model):
         messages: list[Union[SystemMessage, HumanMessage]] = []
 
         if system_prompt:
-            messages.append(SystemMessage(content=[{"type": "text", "text": system_prompt}]))
+            messages.append(
+                SystemMessage(content=[{"type": "text", "text": system_prompt}])
+            )
 
         user_prompt_contents = self.format_user_prompts(user_prompts)
         messages.append(HumanMessage(content=user_prompt_contents))
@@ -176,6 +180,8 @@ class ChatGroqGenerator(weave.Model):
             ]
         )
 
-        response = self.predict(invoke_inputs={"question": question, "context": context})
+        response = self.predict(
+            invoke_inputs={"question": question, "context": context}
+        )
 
         return {"documents": documents, "question": question, "generation": response}

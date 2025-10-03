@@ -101,7 +101,9 @@ class UnstructuredDocumentLoader(weave.Model):
             msg = f"Path is not a directory: {directory_path}"
             raise ValueError(msg)
 
-        return [str(file) for file in path.rglob("*") if file.is_file()]  # Get only files
+        return [
+            str(file) for file in path.rglob("*") if file.is_file()
+        ]  # Get only files
 
     def transform_documents(self, directory_path: str) -> list[Document]:
         """Transform all documents in the given directory into structured format.

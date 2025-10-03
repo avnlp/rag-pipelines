@@ -1,17 +1,4 @@
-import os
-from typing import Any, Optional
-
-import weave
-from langchain_community.retrievers import PineconeHybridSearchRetriever
-from langchain_core.prompts.chat import ChatPromptTemplate
-from langgraph.graph import END, START, StateGraph
-from langgraph.graph.state import CompiledStateGraph
-from weave import Model
-from weave.integrations.langchain import WeaveTracer
-
-from rag_pipelines.llms.groq import ChatGroqGenerator
-from rag_pipelines.query_transformer import QueryTransformer
-from rag_pipelines.websearch import WebSearch
+from typing import Any
 
 
 class SubQueryRouter:
@@ -51,7 +38,9 @@ class SubQueryRouter:
         """
         prompt = f"Break down the following query into simpler sub-queries:\n\n{query}\n\nSub-queries:"
         response = self.llm.generate(prompt)
-        return response.split("\n")  # Assuming the LLM returns sub-queries as newline-separated text.
+        return response.split(
+            "\n"
+        )  # Assuming the LLM returns sub-queries as newline-separated text.
 
     def retrieve_relevant_documents(self, sub_queries: List[str]) -> List[Document]:
         """Retrieve relevant documents for each sub-query from the vector database.
@@ -65,7 +54,9 @@ class SubQueryRouter:
         retrieved_docs = []
         for sub_query in sub_queries:
             query_embedding = self.embedding_model.embed(sub_query)
-            results = self.vectordb.search(query_embedding, top_k=5)  # Retrieve top-K relevant chunks
+            results = self.vectordb.search(
+                query_embedding, top_k=5
+            )  # Retrieve top-K relevant chunks
             retrieved_docs.extend(results)
         return retrieved_docs
 

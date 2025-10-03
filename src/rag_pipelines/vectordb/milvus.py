@@ -8,6 +8,7 @@ from pymilvus import (
     connections,
 )
 
+
 TEXT_FIELD = "text"
 METADATA_FIELD = "metadata"
 DENSE_FIELD = "dense_vector"
@@ -105,7 +106,9 @@ class MilvusVectorDB(weave.Model):
         This method connects to the specified Milvus server and creates a new collection
         with the provided schema, dense field, and index parameters.
         """
-        self.collection = Collection(name=self.collection_name, schema=self.collection_schema)
+        self.collection = Collection(
+            name=self.collection_name, schema=self.collection_schema
+        )
 
         self.collection.create_index(self.dense_field, self.dense_index_params)
         self.collection.create_index(self.sparse_field, self.sparse_index_params)

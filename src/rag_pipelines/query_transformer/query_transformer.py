@@ -46,7 +46,9 @@ class QueryTransformer:
             original_question = "What are the benefits of cloud computing?"
             transformer = QueryTransformer(llm)
             transformed_query = transformer.transform_query(original_question)
-            print(transformed_query["question"])  # Output: 'What advantages does cloud computing provide?'
+            print(
+                transformed_query["question"]
+            )  # Output: 'What advantages does cloud computing provide?'
             ```
         """
         self.prompt = PromptTemplate.from_template(
@@ -91,7 +93,7 @@ class QueryTransformer:
             ```python
             state = {
                 "question": "What are the benefits of cloud computing?",
-                "documents": [{"content": "Sample document"}]
+                "documents": [{"content": "Sample document"}],
             }
             transformer = QueryTransformer(llm)
             new_state = transformer(state)
