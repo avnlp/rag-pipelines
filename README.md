@@ -1,11 +1,5 @@
 # RAG Pipelines
 
-----------------------------------------------------------------------------------------
-
-[![code checks](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml)
-[![integration tests](https://github.com/avnlp/rag-pipelines/actions/workflows/integration_tests.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/integration_tests.yml)
-[![docs](https://github.com/avnlp/rag-pipelines/actions/workflows/docs.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/docs.yml)
-[![codecov](https://codecov.io/github/avnlp/rag-pipelines/graph/badge.svg?token=83MYFZ3UPA)](https://codecov.io/github/avnlp/rag-pipelines)
 ![GitHub License](https://img.shields.io/github/license/avnlp/rag-pipelines)
 
 Advanced RAG Pipelines and Evaluation: Self-Reflective RAG, Corrective RAG, Adaptive RAG, Sub-Query Generation and Routing, DeepEval.
