@@ -1,0 +1,69 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+    - id: trailing-whitespace
+    - id: check-ast
+    - id: check-builtin-literals
+    - id: check-docstring-first
+    - id: check-executables-have-shebangs
+    - id: debug-statements
+    - id: end-of-file-fixer
+    - id: mixed-line-ending
+      args: [--fix=lf]
+    - id: fix-byte-order-marker
+    - id: check-merge-conflict
+    - id: check-symlinks
+    - id: detect-private-key
+    - id: check-yaml
+      args: [--unsafe]
+    - id: check-toml
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.8.22
+    hooks:
+      - id: uv-lock
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.12.12'
+    hooks:
+    - id: ruff-check
+      args: [--fix, --unsafe-fixes, --exit-non-zero-on-fix]
+      types_or: [python, jupyter]
+    - id: ruff-format
+      types_or: [python, jupyter]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+    - id: mypy
+      entry: python3 -m mypy --config-file pyproject.toml
+      language: system
+      types: [python]
+      exclude: "tests"
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.37.1
+    hooks:
+      - id: typos
+
+  - repo: local
+    hooks:
+    - id: pytest
+      name: pytest
+      entry: python3 -m pytest -m "not integration_test"
+      language: system
+      pass_filenames: false
+      always_run: true
+
+ci:
+    autofix_commit_msg: |
+        [pre-commit.ci] Add auto fixes from pre-commit.com hooks
+
+        for more information, see https://pre-commit.ci
+    autofix_prs: true
+    autoupdate_branch: ''
+    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+    autoupdate_schedule: weekly
+    skip: [pytest,doctest,mypy]
+    submodules: false
