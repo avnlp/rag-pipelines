@@ -11,19 +11,25 @@ license = "MIT"
 repository = "https://github.com/avnlp/rag-pipelines"
 requires-python = ">=3.12"
 dependencies = [
+    "datasets",
     "langchain-core",
     "langgraph",
+    "langchain-community",
     "langchain-text-splitters",
     "langchain-experimental",
     "langchain-huggingface",
+    "sentence-transformers",
     "langchain-groq",
     "langchain-milvus",
-    "weave",
+    "langchain-unstructured",
     "edgartools",
-    "fastembed",
     "unstructured[pdf]",
     "deepeval",
-    "arize-phoenix",
+    "python-dotenv",
+    "fsspec",
+    "pyyaml",
+    "torch",
+    "transformers",
 ]
 
 [build-system]
