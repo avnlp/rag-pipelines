@@ -1,0 +1,67 @@
+# PubMedQA Indexing Configuration
+
+
+# Dataset configuration
+dataset:
+  path: "qiaojin/PubMedQA"
+  split_name: "pqa_artificial"
+  split: "train"
+
+# LLM configuration for metadata extraction
+llm:
+  model: "llama-3.3-70b-versatile"
+  temperature: 0
+  max_tokens: 1000
+  max_retries: 3
+
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Milvus Vector Database settings
+vectorstore:
+  collection_name: "pubmedqa"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: true
+
+# Metadata schema for PubMedQA
+metadata_schema:
+  properties:
+    diseases_conditions:
+      type: "string"
+      description: "Diseases, disorders, or medical conditions mentioned in the text"
+    biological_entities:
+      type: "string"
+      description: "Genes, proteins, cells, molecules, or biological pathways studied"
+    species:
+      type: "string"
+      description: "Species involved in the study (e.g., human, mouse, rat)"
+    study_type:
+      type: "string"
+      description: "Type of research study design"
+    main_findings:
+      type: "string"
+      description: "Key results or conclusions from the study"
+    measurements_assays:
+      type: "string"
+      description: "Experimental methods, assays, or measurements used"
+    tissues_organs:
+      type: "string"
+      description: "Tissues, organs, or biological systems studied"
+    interventions_treatments:
+      type: "string"
+      description: "Treatments, interventions, or manipulations performed"
+    population_cohort:
+      type: "string"
+      description: "Description of study population or cohort characteristics"
+    statistical_significance:
+      type: "string"
+      description: "Overall statistical significance of main findings"
+    effect_direction:
+      type: "string"
+      description: "Direction of main effects reported"
+
+# Default value for missing metadata fields
+metadata_defaults:
+  default_value: "not specified"

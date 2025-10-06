@@ -1,0 +1,132 @@
+# PubMedQA RAG Configuration
+
+# Dataset configuration
+dataset:
+  path: "qiaojin/PubMedQA"
+  split_name: "pqa_artificial"
+  split: "train"
+  question_field: "question"
+  answer_field: "long_answer"
+
+# Chunking configuration
+chunking:
+    chunking_strategy: "by_title"
+    max_characters: 500
+    new_after_n_chars: 500
+    overlap: 100
+    overlap_all: false
+    combine_text_under_n_chars: 500
+    include_orig_elements: true
+    multipage_sections: true
+
+# Metadata schema
+metadata_schema:
+  properties:
+    diseases_conditions:
+      type: "string"
+      description: "Diseases, disorders, or medical conditions mentioned"
+    biological_entities:
+      type: "string"
+      description: "Genes, proteins, cells, molecules, or biological pathways"
+    species:
+      type: "string"
+      description: "Species involved (e.g., human, mouse, rat)"
+    study_type:
+      type: "string"
+      description: "Type of research study design"
+    main_findings:
+      type: "string"
+      description: "Key results or conclusions from the study"
+    measurements_assays:
+      type: "string"
+      description: "Experimental methods, assays, or measurements used"
+    tissues_organs:
+      type: "string"
+      description: "Tissues, organs, or biological systems studied"
+    interventions_treatments:
+      type: "string"
+      description: "Treatments, interventions, or manipulations performed"
+    population_cohort:
+      type: "string"
+      description: "Study population or cohort characteristics"
+    statistical_significance:
+      type: "string"
+      description: "Statistical significance of main findings"
+    effect_direction:
+      type: "string"
+      description: "Direction of main effects reported"
+
+
+# LLM configurations
+llm:
+  extractor:
+    model: "llama-3.3-70b-versatile"
+    temperature: 0
+    max_tokens: 1000
+    max_retries: 3
+  response:
+    model: "qwen/qwen3-32b"
+    temperature: 0
+    max_tokens: 1000
+    max_retries: 3
+    reasoning_format: "parsed"
+
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Contextual Reranker
+reranker:
+  model: "ContextualAI/ctxl-rerank-v2-instruct-multilingual-1b"
+  instruction: "Prioritize Medical articles that directly answer the question."
+
+# Vector store (Milvus)
+vectorstore:
+  collection_name: "pubmedqa"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: false
+
+# Retriever
+retriever:
+  k: 5
+
+# RAG prompt
+prompt:
+  system_message: |
+    You are an expert biomedical researcher. Use the retrieved context
+    to answer the question precisely. Provide a detailed and accurate
+    answer based on the provided context.
+  human_message: "Context:\n{context}\n\nQuestion: {question}"
+
+# Evaluation metrics thresholds and models
+metrics:
+  contextual_recall:
+    threshold: 0.7
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  contextual_precision:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  contextual_relevancy:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  answer_relevancy:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  faithfulness:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
