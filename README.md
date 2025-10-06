@@ -2,8 +2,6 @@
 
 ![GitHub License](https://img.shields.io/github/license/avnlp/rag-pipelines)
 
-Advanced RAG Pipelines and Evaluation: Self-Reflective RAG, Corrective RAG, Adaptive RAG, Sub-Query Generation and Routing, DeepEval.
-
 ## Developing
 
 ### Installing dependencies
