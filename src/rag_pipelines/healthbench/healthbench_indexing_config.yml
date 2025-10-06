@@ -1,0 +1,78 @@
+# HealthBench Indexing Configuration
+
+# Dataset configuration
+dataset:
+  path: "Tonic/Health-Bench-Eval-OSS-2025-07"
+  config_name: "default"
+  split: "oss_eval"  # Options: "oss_eval", "hard", "consensus"
+
+# LLM configuration for metadata extraction
+llm:
+  model: "llama-3.3-70b-versatile"
+  temperature: 0
+  max_tokens: 1000
+  max_retries: 3
+
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Milvus Vector Database settings
+vectorstore:
+  collection_name: "healthbench"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: true
+
+# Metadata schema for HealthBench clinical conversations
+metadata_schema:
+  properties:
+    clinical_scenario:
+      type: "string"
+      description: "Primary clinical scenario or medical situation described"
+    chief_complaint:
+      type: "string"
+      description: "Main symptom or reason for seeking medical attention"
+    medical_specialty:
+      type: "string"
+      description: "Relevant medical specialty (e.g., cardiology, pediatrics, emergency medicine)"
+    urgency_level:
+      type: "string"
+      description: "Level of medical urgency (emergency, urgent, routine, preventive)"
+    patient_demographics:
+      type: "string"
+      description: "Patient age group, gender, or other demographic factors mentioned"
+    symptom_duration:
+      type: "string"
+      description: "Duration or timing of symptoms if specified"
+    severity_indicators:
+      type: "string"
+      description: "Signs of condition severity or red flags mentioned"
+    diagnostic_considerations:
+      type: "string"
+      description: "Potential diagnoses or differential diagnoses discussed"
+    treatment_approaches:
+      type: "string"
+      description: "Treatment options, medications, or management strategies mentioned"
+    preventive_care:
+      type: "string"
+      description: "Preventive measures or health maintenance recommendations"
+    risk_factors:
+      type: "string"
+      description: "Risk factors or predisposing conditions identified"
+    clinical_setting:
+      type: "string"
+      description: "Healthcare setting (emergency room, primary care, telehealth, etc.)"
+    communication_style:
+      type: "string"
+      description: "Style of clinical communication (empathetic, directive, educational, etc.)"
+    decision_complexity:
+      type: "string"
+      description: "Complexity level of clinical decision making required"
+    ethical_considerations:
+      type: "string"
+      description: "Ethical issues or considerations in the scenario"
+
+# Default value for missing metadata fields
+metadata_defaults:
+  default_value: "not specified"
