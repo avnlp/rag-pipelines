@@ -1,6 +1,6 @@
-"""Unstructured document chunking library.
+"""Unstructured Chunker: Chunking documents using strategies provided by Unstructured.
 
-This module provides the `UnstructuredChunker` class for chunking unstructured documents
+This class provides functionality for chunking unstructured documents
 using different strategies from the `unstructured` library. It supports:
 
 - "basic" chunking: Splits documents into chunks based on character limits with
@@ -13,7 +13,7 @@ fine-grained control over the resulting chunks.
 
 Example Usage:
 ```python
-from dataloaders.text_splitters import UnstructuredChunker
+from rag_pipelines.utils.unstructured.unstructured_chunker import UnstructuredChunker
 
 # Initialize the chunker
 chunker = UnstructuredChunker()
@@ -22,49 +22,45 @@ chunker = UnstructuredChunker()
 documents = [...]
 
 # Chunk the documents using the "basic" strategy
-chunked_documents = chunker.transform_documents(documents)"""
+chunked_documents = chunker.transform_documents(documents)
+```
+"""
 
 import logging
 from typing import Any, Literal, Optional
 
-import weave
 from langchain_core.documents import Document
 from unstructured.chunking.basic import chunk_elements
 from unstructured.chunking.title import chunk_by_title
 from unstructured.documents.elements import Element, NarrativeText
 
-from rag_pipelines.utils import LoggerFactory
+
+logger = logging.getLogger(__name__)
 
 
-# Initialize logger
-logger_factory = LoggerFactory(logger_name=__name__, log_level=logging.INFO)
-logger = logger_factory.get_logger()
-
-
-class UnstructuredChunker(weave.Model):
-    """A class for chunking documents using different strategies provided by the unstructured library.
+class UnstructuredChunker:
+    """A class for chunking documents using the Unstructured library.
 
     Supports both "basic" and "by_title" chunking strategies.
 
     Attributes:
-        chunking_strategy (Literal["basic", "by_title"]): The strategy to use for chunking elements.
-        max_characters (int): Maximum number of characters in each chunk for the "basic" strategy.
-        new_after_n_chars (int): Number of characters after which a new chunk is forced for the "basic" strategy.
-        overlap (int): Number of characters to overlap between chunks for the "basic" strategy.
-        overlap_all (bool): Whether to overlap all chunks for the "basic" strategy.
-        combine_text_under_n_chars (Optional[int]): Maximum characters to combine smaller text elements for the "basic" strategy.
-        include_orig_elements (Optional[bool]): Whether to include original elements in the output for the "basic" strategy.
-        multipage_sections (Optional[bool]): Whether to allow sections to span multiple pages for the "by_title" strategy.
+        chunking_strategy (Literal["basic", "by_title"]): The strategy
+            to use for chunking elements.
+        max_characters (int): Maximum number of characters in each chunk
+            for the "basic" strategy.
+        new_after_n_chars (int): Number of characters after which a new
+            chunk is forced for the "basic" strategy.
+        overlap (int): Number of characters to overlap between chunks
+            for the "basic" strategy.
+        overlap_all (bool): Whether to overlap all chunks for the
+            "basic" strategy.
+        combine_text_under_n_chars (Optional[int]): Maximum characters
+            to combine smaller text elements for the "basic" strategy.
+        include_orig_elements (Optional[bool]): Whether to include
+            original elements in the output for the "basic" strategy.
+        multipage_sections (Optional[bool]): Whether to allow sections
+            to span multiple pages for the "by_title" strategy.
     """
-
-    chunking_strategy: Literal["basic", "by_title"]
-    max_characters: int
-    new_after_n_chars: int
-    overlap: int
-    overlap_all: bool
-    combine_text_under_n_chars: Optional[int]
-    include_orig_elements: Optional[bool]
-    multipage_sections: Optional[bool]
 
     def __init__(
         self,
@@ -80,30 +76,26 @@ class UnstructuredChunker(weave.Model):
         """Initialize the chunker with the specified chunking strategy and parameters.
 
         Args:
-            chunking_strategy (Literal["basic", "by_title"], optional): Chunking strategy to use. Defaults to "basic".
-            max_characters (int, optional): Maximum characters in a chunk for the "basic" strategy. Defaults to 500.
-            new_after_n_chars (int, optional): Characters after which a new chunk is forced for the "basic" strategy.
-            Defaults to 500.
-            overlap (int, optional): Characters to overlap between chunks for the "basic" strategy. Defaults to 0.
-            overlap_all (bool, optional): Overlap all chunks for the "basic" strategy. Defaults to False.
-            combine_text_under_n_chars (Optional[int], optional): Combine text elements under this limit for the
-            "basic" strategy. Defaults to None.
-            include_orig_elements (Optional[bool], optional): Include original elements in output for the "basic"
-            strategy. Defaults to None.
-            multipage_sections (Optional[bool], optional): Allow sections to span multiple pages for the "by_title"
-            strategy. Defaults to None.
+            chunking_strategy (Literal["basic", "by_title"], optional):
+                Chunking strategy to use. Defaults to "basic".
+            max_characters (int, optional): Maximum characters in a chunk
+                for the "basic" strategy. Defaults to 500.
+            new_after_n_chars (int, optional): Characters after which a new
+                chunk is forced for the "basic" strategy. Defaults to 500.
+            overlap (int, optional): Characters to overlap between chunks
+                for the "basic" strategy. Defaults to 0.
+            overlap_all (bool, optional): Overlap all chunks for the
+                "basic" strategy. Defaults to False.
+            combine_text_under_n_chars (Optional[int], optional): Combine
+                text elements under this limit for the "basic" strategy.
+                Defaults to None.
+            include_orig_elements (Optional[bool], optional): Include
+                original elements in output for the "basic" strategy.
+                Defaults to None.
+            multipage_sections (Optional[bool], optional): Allow sections
+                to span multiple pages for the "by_title" strategy.
+                Defaults to None.
         """
-        super().__init__(
-            chunking_strategy=chunking_strategy,
-            max_characters=max_characters,
-            new_after_n_chars=new_after_n_chars,
-            overlap=overlap,
-            overlap_all=overlap_all,
-            combine_text_under_n_chars=combine_text_under_n_chars,
-            include_orig_elements=include_orig_elements,
-            multipage_sections=multipage_sections,
-        )
-
         self.chunking_strategy = chunking_strategy
         self.max_characters = max_characters
         self.new_after_n_chars = new_after_n_chars
@@ -123,13 +115,16 @@ class UnstructuredChunker(weave.Model):
         of each document separately in a list.
 
         Args:
-            documents (List[Document]): A list of LangChain Document objects to be converted to NarrativeText elements.
+            documents (List[Document]): A list of LangChain Document
+                objects to be converted to NarrativeText elements.
 
         Returns:
             tuple[list[NarrativeText], list[dict[str, Any]]]:
-                - A list of unstructured NarrativeText elements, where each element corresponds to a document's text.
-                - A list of metadata dictionaries, where each dictionary corresponds to the metadata of a document in the
-                input list.
+                - A list of unstructured NarrativeText elements, where
+                  each element corresponds to a document's text.
+                - A list of metadata dictionaries, where each dictionary
+                  corresponds to the metadata of a document in the
+                  input list.
 
         """
         elements = []
@@ -177,7 +172,8 @@ class UnstructuredChunker(weave.Model):
             List[Document]: List of chunked documents.
 
         Raises:
-            ValueError: If no documents are provided or if an unsupported chunking strategy is specified.
+            ValueError: If no documents are provided or if an unsupported
+                chunking strategy is specified.
         """
         if not documents:
             msg = "No documents provided for transformation."
