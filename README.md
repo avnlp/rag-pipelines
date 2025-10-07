@@ -2,6 +2,18 @@
 
 ![GitHub License](https://img.shields.io/github/license/avnlp/rag-pipelines)
 
+## Datasets
+
+We evaluate the RAG pipelines on the following datasets:
+
+| Dataset | Description |
+| :--- | :--- |
+| **HealthBench** | A comprehensive benchmark for evaluating medical AI, featuring multi-turn conversations and expert assessments. |
+| **MedCaseReasoning** | A collection of medical case studies that include detailed, step-by-step reasoning processes. |
+| **MetaMedQA** | A medical question-answering dataset where contexts are sourced from USMLE textbooks. |
+| **PubMedQA** | A biomedical question-answering dataset derived from abstracts in PubMed articles. |
+
+
 ## Developing
 
 ### Installing dependencies
