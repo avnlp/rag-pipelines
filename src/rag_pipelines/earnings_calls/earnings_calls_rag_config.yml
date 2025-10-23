@@ -1,0 +1,106 @@
+# Earnings Calls RAG Configuration
+
+# Dataset configuration
+dataset:
+  path: "lamini/earnings-calls-qa"
+  split: "test"
+  question_field: "question"
+  answer_field: "answer"
+
+# Metadata schema for Earnings Calls
+metadata_schema:
+  properties:
+    company:
+      type: "string"
+      description: "Company ticker (e.g., AAPL, MSFT, GOOG)"
+    quarter:
+      type: "string"
+      description: "Quarter of the year (e.g., Q1, Q2, Q3, Q4)"
+    year:
+      type: "string"
+      description: "Year of the earnings call (e.g., 2022, 2023, 2024)"
+
+# LLM configurations
+llm:
+  extractor:
+    model: "llama-3.3-70b-versatile"
+    temperature: 0
+    max_tokens: 1000
+    max_retries: 3
+  response:
+    model: "qwen/qwen3-32b"
+    temperature: 0
+    max_tokens: 1000
+    max_retries: 3
+    reasoning_format: "parsed"
+
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Contextual Reranker
+reranker:
+  model: "ContextualAI/ctxl-rerank-v2-instruct-multilingual-1b"
+  instruction: "Prioritize Medical articles that directly answer the question."
+
+# Vector store (Milvus)
+vectorstore:
+  collection_name: "earnings_calls"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: false
+
+# Unstructured Chunker configuration
+chunking:
+  chunking_strategy: "by_title"
+  max_characters: 1000
+  new_after_n_chars: 100
+  overlap: 50
+  overlap_all: true
+  combine_text_under_n_chars: 100
+  include_orig_elements: true
+  multipage_sections: true
+
+# Retriever
+retriever:
+  k: 5
+
+# RAG prompt
+prompt:
+  system_message: |
+    You are an expert earnings call financial analyst. Use the retrieved context
+    to answer the question precisely. Provide a detailed and accurate
+    answer based on the provided context.
+  human_message: "Context:\n{context}\n\nQuestion: {question}"
+
+# Evaluation metrics thresholds and models
+metrics:
+  contextual_recall:
+    threshold: 0.7
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  contextual_precision:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  contextual_relevancy:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  answer_relevancy:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true
+
+  faithfulness:
+    threshold: 0.5
+    model: "llama-3.3-70b-versatile"
+    include_reason: true
+    async_mode: true

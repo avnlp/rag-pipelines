@@ -1,0 +1,41 @@
+# Earnings Calls Indexing Configuration
+
+# Dataset configuration
+dataset:
+  path: "lamini/earnings-calls-qa"
+  split: "train"
+
+# LLM configuration for metadata extraction
+llm:
+  model: "llama-3.3-70b-versatile"
+  temperature: 0
+  max_tokens: 1000
+  max_retries: 3
+
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Milvus Vector Database settings
+vectorstore:
+  collection_name: "earnings_calls"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: true
+
+# Metadata schema for Earnings Calls
+metadata_schema:
+  properties:
+    company:
+      type: "string"
+      description: "Company ticker (e.g., AAPL, MSFT, GOOG)"
+    quarter:
+      type: "string"
+      description: "Quarter of the year (e.g., Q1, Q2, Q3, Q4)"
+    year:
+      type: "string"
+      description: "Year of the earnings call (e.g., 2022, 2023, 2024)"
+
+# Default value for missing metadata fields
+metadata_defaults:
+  default_value: "not specified"
