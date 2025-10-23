@@ -57,7 +57,7 @@ reranker:
 
 # Vector store (Milvus)
 vectorstore:
-  collection_name: "pubmedqa"
+  collection_name: "medcasereasoning"
   vector_fields: ["dense", "sparse"]
   consistency_level: "Strong"
   drop_old: false

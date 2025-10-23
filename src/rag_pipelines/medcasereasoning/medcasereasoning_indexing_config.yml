@@ -23,6 +23,17 @@ vectorstore:
   consistency_level: "Strong"
   drop_old: true
 
+# Unstructured Chunker configuration
+chunking:
+  chunking_strategy: "by_title"
+  max_characters: 1000
+  new_after_n_chars: 100
+  overlap: 50
+  overlap_all: true
+  combine_text_under_n_chars: 100
+  include_orig_elements: true
+  multipage_sections: true
+
 # Metadata schema for MedCaseReasoning
 metadata_schema:
   properties:
