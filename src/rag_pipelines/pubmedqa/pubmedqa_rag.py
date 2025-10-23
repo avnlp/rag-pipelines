@@ -389,8 +389,8 @@ def main() -> None:
             "response": "",
             "evaluation_scores": {},
         }
-        result = rag_pipeline.invoke(  # type: ignore[arg-type]
-            initial_state,
+        result = rag_pipeline.invoke(
+            initial_state,  # type: ignore[arg-type]
             config={"callbacks": [CallbackHandler()]},
         )
         print(result)
