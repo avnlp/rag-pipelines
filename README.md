@@ -1,5 +1,6 @@
 # RAG Pipelines
 
+[![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/avnlp/rag-pipelines)
 [![code checks](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml)
 [![tests](https://github.com/avnlp/rag-pipelines/actions/workflows/tests.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/github/avnlp/rag-pipelines/graph/badge.svg?token=83MYFZ3UPA)](https://codecov.io/github/avnlp/rag-pipelines)
