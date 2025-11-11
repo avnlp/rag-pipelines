@@ -1,10 +1,14 @@
-# RAG Pipelines
+<h1 align="center"> <a href="https://github.com/avnlp/rag-pipelines"> RAG Pipelines </a> </h1>
+
+<div align="center">
 
 [![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/avnlp/rag-pipelines)
 [![code checks](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml)
 [![tests](https://github.com/avnlp/rag-pipelines/actions/workflows/tests.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/github/avnlp/rag-pipelines/graph/badge.svg?token=83MYFZ3UPA)](https://codecov.io/github/avnlp/rag-pipelines)
-![GitHub License](https://img.shields.io/github/license/avnlp/rag-pipelines)
+[![License](https://img.shields.io/github/license/avnlp/rag-pipelines?color=green)](https://github.com/avnlp/rag-pipelines/blob/main/LICENSE)
+
+</div>
 
 This repository contains advanced Retrieval-Augmented Generation (RAG) pipelines specifically designed for domain-specific tasks.
 
