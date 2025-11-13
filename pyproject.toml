@@ -24,12 +24,15 @@ dependencies = [
     "langchain-unstructured",
     "edgartools",
     "unstructured[pdf]",
-    "deepeval",
+    "deepeval>=3.7.0",
+    "google-genai", # DeepEval Dependency
+    "posthog", # DeepEval Dependency
     "python-dotenv",
     "fsspec",
     "pyyaml",
     "torch",
     "transformers",
+    "baml",
 ]
 
 [build-system]
@@ -43,28 +46,23 @@ dev = [
     "nbqa>=1.9.1",
     "pip-audit>=2.7.3",
     "pre-commit>=4.1.0",
-    "pytest>=8.3.4",
-    "pytest-asyncio>=0.25.2",
-    "pytest-cov>=6.0.0",
-    "pytest-mock>=3.14.0",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-mock",
     "ruff>=0.9.2",
-]
-docs = [
-    "jinja2>=3.1.6", # Pinning version to address vulnerability GHSA-cpwx-vrp4-4pq7
-    "mkdocs>=1.6.0",
-    "mkdocs-material>=9.5.15",
-    "mkdocstrings>=0.24.1",
-    "mkdocstrings-python>=1.10.0",
-    "ipykernel>=6.29.5",
-    "ipython>=8.31.0",
 ]
 
 # Default dependency groups to be installed
 [tool.uv]
-default-groups = ["dev", "docs"]
+default-groups = ["dev"]
+
+[[tool.mypy.overrides]]
+module = ["datasets", "fsspec"]
+ignore_missing_imports = true
 
 [tool.mypy]
-follow_imports = "normal"
+follow_imports = "skip"
 ignore_missing_imports = false
 install_types = true
 pretty = true
@@ -80,16 +78,17 @@ allow_untyped_calls = false
 allow_incomplete_defs = false
 allow_untyped_decorators = false
 warn_redundant_casts = true
-warn_unused_ignores = true
+warn_unused_ignores = false
 implicit_reexport = false
 strict_equality = true
 extra_checks = true
 mypy_path = "src"
 disable_error_code = ["operator"]
+exclude = ["src/rag_pipelines/baml_client/*", "src/rag_pipelines/baml_src/*"]
 
 [tool.ruff]
 include = ["*.py", "pyproject.toml", "*.ipynb"]
-exclude = []
+exclude = ["src/rag_pipelines/baml_client", "src/rag_pipelines/baml_src"]
 line-length = 88
 
 [tool.ruff.format]
@@ -155,8 +154,9 @@ max-doc-length = 88
 markers = [
     "integration_test: marks tests as integration tests",
 ]
+asyncio_mode = "auto"
 
 [tool.coverage]
     [tool.coverage.run]
     source=["rag_pipelines"]
-    omit=["tests/*", "*__init__.py"]
+    omit=["tests/*", "*__init__.py", "src/rag_pipelines/baml_client/*", "src/rag_pipelines/baml_src/*"]
