@@ -24,6 +24,7 @@ dependencies = [
     "langchain-unstructured",
     "edgartools",
     "unstructured[pdf]",
+    "lingua-language-detector",
     "deepeval>=3.7.0",
     "google-genai", # DeepEval Dependency
     "posthog", # DeepEval Dependency
@@ -32,7 +33,9 @@ dependencies = [
     "pyyaml",
     "torch",
     "transformers",
-    "baml",
+    "baml-py==0.214.0",
+    "cachetools>=5.3.0",
+    "cachetools-async>=0.0.5",
 ]
 
 [build-system]
