@@ -1,4 +1,4 @@
-exclude: '^(src/rag_pipelines/baml_client/|src/rag_pipelines/baml_src/|tests/|__init__.py)'
+exclude: '^(src/rag_pipelines/baml_client/|src/rag_pipelines/baml_src/)'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
