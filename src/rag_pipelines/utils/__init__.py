@@ -6,7 +6,6 @@ from rag_pipelines.utils.metadata_enricher.metadata_enricher import (
     EnrichmentMode,
     MetadataEnricher,
 )
-from rag_pipelines.utils.metadata_extractor.metadata_extractor import MetadataExtractor
 from rag_pipelines.utils.unstructured.unstructured_api_loader import (
     UnstructuredAPIDocumentLoader,
 )
@@ -21,8 +20,7 @@ __all__ = [
     "UnstructuredAPIDocumentLoader",
     "UnstructuredChunker",
     "UnstructuredDocumentLoader",
-    "MetadataExtractor",
     "MetadataEnricher",
-    "EnrichmentConfig",
     "EnrichmentMode",
+    "EnrichmentConfig",
 ]
