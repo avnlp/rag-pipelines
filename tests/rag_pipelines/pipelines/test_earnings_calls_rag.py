@@ -240,6 +240,7 @@ class TestEarningsCallsRAG:
             )
 
     @pytest.mark.asyncio
+    @patch("rag_pipelines.earnings_calls.earnings_calls_rag.b.GenerateAnswer")
     @patch("rag_pipelines.earnings_calls.earnings_calls_rag.evaluate")
     @patch("rag_pipelines.earnings_calls.earnings_calls_rag.load_dataset")
     @patch("rag_pipelines.earnings_calls.earnings_calls_rag.HuggingFaceEmbeddings")
@@ -305,8 +306,13 @@ class TestEarningsCallsRAG:
         mock_embeddings,
         mock_dataset,
         mock_evaluate,
+        mock_generate_answer,
     ):
         """Test the main function with mocked dependencies to ensure it executes."""
+        mock_generate_answer.return_value = Answer(
+            summary="Test answer", chain_of_thought="Test reasoning"
+        )
+
         mock_dataset.return_value = Dataset.from_dict(
             {"prompt": ["test question"], "ideal_completion": ["test answer"]}
         )
