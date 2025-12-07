@@ -25,6 +25,9 @@ type_map = {
     "types.FinanceBenchAnswer": types.FinanceBenchAnswer,
     "stream_types.FinanceBenchAnswer": stream_types.FinanceBenchAnswer,
 
+    "types.HealthBenchAnswer": types.HealthBenchAnswer,
+    "stream_types.HealthBenchAnswer": stream_types.HealthBenchAnswer,
+
     "types.MedCaseReasoningAnswer": types.MedCaseReasoningAnswer,
     "stream_types.MedCaseReasoningAnswer": stream_types.MedCaseReasoningAnswer,
 

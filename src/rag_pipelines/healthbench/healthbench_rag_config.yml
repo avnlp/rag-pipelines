@@ -7,7 +7,7 @@ dataset:
   question_field: "prompt"
   answer_field: "ideal_completions_data"
 
-# Metadata schema for clinical conversations
+# Metadata schema for HealthBench clinical conversations
 metadata_schema:
   properties:
     clinical_scenario:
@@ -18,57 +18,45 @@ metadata_schema:
       description: "Main symptom or reason for seeking medical attention"
     medical_specialty:
       type: "string"
-      description: "Relevant medical specialty (cardiology, pediatrics, emergency, etc.)"
+      description: "Relevant medical specialty (e.g., cardiology, pediatrics, emergency medicine)"
     urgency_level:
       type: "string"
-      description: "Medical urgency (emergency, urgent, routine, preventive)"
+      description: "Level of medical urgency (emergency, urgent, routine, preventive)"
     patient_demographics:
       type: "string"
-      description: "Patient age group, gender, or demographic factors"
+      description: "Patient age group, gender, or other demographic factors mentioned"
     symptom_duration:
       type: "string"
       description: "Duration or timing of symptoms if specified"
     severity_indicators:
       type: "string"
-      description: "Signs of condition severity or red flags"
+      description: "Signs of condition severity or red flags mentioned"
     diagnostic_considerations:
       type: "string"
-      description: "Potential diagnoses or differential diagnoses"
+      description: "Potential diagnoses or differential diagnoses discussed"
     treatment_approaches:
       type: "string"
-      description: "Treatment options, medications, or management strategies"
+      description: "Treatment options, medications, or management strategies mentioned"
     preventive_care:
       type: "string"
       description: "Preventive measures or health maintenance recommendations"
     risk_factors:
       type: "string"
-      description: "Risk factors or predisposing conditions"
+      description: "Risk factors or predisposing conditions identified"
     clinical_setting:
       type: "string"
-      description: "Healthcare setting (ER, primary care, telehealth, etc.)"
+      description: "Healthcare setting (emergency room, primary care, telehealth, etc.)"
     communication_style:
       type: "string"
-      description: "Style of clinical communication required"
+      description: "Style of clinical communication (empathetic, directive, educational, etc.)"
     decision_complexity:
       type: "string"
-      description: "Complexity level of clinical decision making"
+      description: "Complexity level of clinical decision making required"
     ethical_considerations:
       type: "string"
       description: "Ethical issues or considerations in the scenario"
 
-# LLM configurations
-llm:
-  extractor:
-    model: "llama-3.3-70b-versatile"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-  response:
-    model: "qwen/qwen3-32b"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-    reasoning_format: "parsed"
+
 
 # Embedding model
 embedding:
@@ -90,32 +78,6 @@ vectorstore:
 retriever:
   k: 5
 
-
-# RAG prompt optimized for clinical conversations
-prompt:
-  system_message: |
-    You are a medical AI assistant providing safe, evidence-based health information.
-
-    CRITICAL SAFETY GUIDELINES:
-    - For emergency symptoms (chest pain, difficulty breathing, severe bleeding, etc.), immediately recommend emergency services
-    - Always emphasize the importance of professional medical evaluation
-    - Do not provide definitive diagnoses without proper medical examination
-    - Recommend appropriate level of care based on symptom severity
-    - Provide clear, actionable advice while acknowledging limitations
-
-    Use the retrieved clinical context to inform your response while adhering to established medical guidelines.
-    Prioritize patient safety above all else.
-  human_message: |
-    Clinical Conversation Context:
-    {context}
-
-    Current Patient Question: {question}
-
-    Provide a helpful, safe medical response that:
-    1. Acknowledges the patient's concerns
-    2. Provides appropriate medical information based on the context
-    3. Recommends appropriate next steps for care
-    4. Includes important safety considerations
 
 # Evaluation metrics:
 metrics:

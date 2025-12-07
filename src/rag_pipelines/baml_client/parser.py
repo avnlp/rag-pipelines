@@ -42,6 +42,12 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateFinanceBenchAnswer", llm_response=llm_response, mode="request")
         return typing.cast(types.FinanceBenchAnswer, result)
 
+    def GenerateHealthBenchAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.HealthBenchAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateHealthBenchAnswer", llm_response=llm_response, mode="request")
+        return typing.cast(types.HealthBenchAnswer, result)
+
     def GenerateMedCaseReasoningAnswer(
         self, llm_response: str, baml_options: BamlCallOptions = {},
     ) -> types.MedCaseReasoningAnswer:
@@ -85,6 +91,12 @@ class LlmStreamParser:
     ) -> stream_types.FinanceBenchAnswer:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateFinanceBenchAnswer", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.FinanceBenchAnswer, result)
+
+    def GenerateHealthBenchAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.HealthBenchAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateHealthBenchAnswer", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.HealthBenchAnswer, result)
 
     def GenerateMedCaseReasoningAnswer(
         self, llm_response: str, baml_options: BamlCallOptions = {},

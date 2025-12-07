@@ -20,7 +20,7 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(type_builder.TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          ["Answer","DynamicMetadata","FinanceBenchAnswer","MedCaseReasoningAnswer","MetaMedQAAnswer","PubMedAnswer",]
+          ["Answer","DynamicMetadata","FinanceBenchAnswer","HealthBenchAnswer","MedCaseReasoningAnswer","MetaMedQAAnswer","PubMedAnswer",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
@@ -31,7 +31,7 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
     # #########################################################################
-    # Generated classes 6
+    # Generated classes 7
     # #########################################################################
 
     @property
@@ -45,6 +45,10 @@ class TypeBuilder(type_builder.TypeBuilder):
     @property
     def FinanceBenchAnswer(self) -> "FinanceBenchAnswerViewer":
         return FinanceBenchAnswerViewer(self)
+
+    @property
+    def HealthBenchAnswer(self) -> "HealthBenchAnswerViewer":
+        return HealthBenchAnswerViewer(self)
 
     @property
     def MedCaseReasoningAnswer(self) -> "MedCaseReasoningAnswerViewer":
@@ -66,7 +70,7 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
 # #########################################################################
-# Generated classes 6
+# Generated classes 7
 # #########################################################################
 
 class AnswerAst:
@@ -190,6 +194,49 @@ class FinanceBenchAnswerViewer(FinanceBenchAnswerAst):
 
 
 class FinanceBenchAnswerProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    
+    @property
+    def chain_of_thought(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("chain_of_thought"))
+    
+    @property
+    def summary(self) -> type_builder.ClassPropertyViewer:
+        return type_builder.ClassPropertyViewer(self.__bldr.property("summary"))
+    
+    
+
+
+class HealthBenchAnswerAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("HealthBenchAnswer")
+        self._properties: typing.Set[str] = set([  "chain_of_thought",  "summary",  ])
+        self._props = HealthBenchAnswerProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "HealthBenchAnswerProperties":
+        return self._props
+
+
+class HealthBenchAnswerViewer(HealthBenchAnswerAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def list_properties(self) -> typing.List[typing.Tuple[str, type_builder.ClassPropertyViewer]]:
+        return [(name, type_builder.ClassPropertyViewer(self._bldr.property(name))) for name in self._properties]
+    
+
+
+class HealthBenchAnswerProperties:
     def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
         self.__bldr = bldr
         self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821

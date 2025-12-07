@@ -6,35 +6,6 @@ dataset:
   config_name: "default"
   split: "oss_eval"  # Options: "oss_eval", "hard", "consensus"
 
-# LLM configuration for metadata extraction
-llm:
-  model: "llama-3.3-70b-versatile"
-  temperature: 0
-  max_tokens: 1000
-  max_retries: 3
-
-# Embedding model
-embedding:
-  model_name: "Qwen/Qwen3-Embedding-0.6B"
-
-# Milvus Vector Database settings
-vectorstore:
-  collection_name: "healthbench"
-  vector_fields: ["dense", "sparse"]
-  consistency_level: "Strong"
-  drop_old: true
-
-# Unstructured Chunker configuration
-chunking:
-  chunking_strategy: "by_title"
-  max_characters: 1000
-  new_after_n_chars: 100
-  overlap: 50
-  overlap_all: true
-  combine_text_under_n_chars: 100
-  include_orig_elements: true
-  multipage_sections: true
-
 # Metadata schema for HealthBench clinical conversations
 metadata_schema:
   properties:
@@ -83,6 +54,30 @@ metadata_schema:
     ethical_considerations:
       type: "string"
       description: "Ethical issues or considerations in the scenario"
+
+
+
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Milvus Vector Database settings
+vectorstore:
+  collection_name: "healthbench"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: true
+
+# Unstructured Chunker configuration
+chunking:
+  chunking_strategy: "by_title"
+  max_characters: 1000
+  new_after_n_chars: 100
+  overlap: 50
+  overlap_all: true
+  combine_text_under_n_chars: 100
+  include_orig_elements: true
+  multipage_sections: true
 
 # Default value for missing metadata fields
 metadata_defaults:
