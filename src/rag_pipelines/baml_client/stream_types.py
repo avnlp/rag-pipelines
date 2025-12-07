@@ -23,8 +23,12 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (1)
+# Generated classes (2)
 # #########################################################################
+
+class Answer(BaseModel):
+    chain_of_thought: typing.Optional[str] = None
+    summary: typing.Optional[str] = None
 
 class DynamicMetadata(BaseModel):
     model_config = ConfigDict(extra='allow')

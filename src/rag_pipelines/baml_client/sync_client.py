@@ -105,6 +105,20 @@ class BamlSyncClient:
                 "text": text,
             })
             return typing.cast(types.DynamicMetadata, result.cast_to(types, types, stream_types, False, __runtime__))
+    def GenerateAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> types.Answer:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            stream = self.stream.GenerateAnswer(context=context,question=question,
+                baml_options=baml_options)
+            return stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = self.__options.merge_options(baml_options).call_function_sync(function_name="GenerateAnswer", args={
+                "context": context,"question": question,
+            })
+            return typing.cast(types.Answer, result.cast_to(types, types, stream_types, False, __runtime__))
     
 
 
@@ -126,6 +140,18 @@ class BamlStreamClient:
           lambda x: typing.cast(types.DynamicMetadata, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
+    def GenerateAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[stream_types.Answer, types.Answer]:
+        ctx, result = self.__options.merge_options(baml_options).create_sync_stream(function_name="GenerateAnswer", args={
+            "context": context,"question": question,
+        })
+        return baml_py.BamlSyncStream[stream_types.Answer, types.Answer](
+          result,
+          lambda x: typing.cast(stream_types.Answer, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.Answer, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
     
 
 class BamlHttpRequestClient:
@@ -141,6 +167,13 @@ class BamlHttpRequestClient:
             "text": text,
         }, mode="request")
         return result
+    def GenerateAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="GenerateAnswer", args={
+            "context": context,"question": question,
+        }, mode="request")
+        return result
     
 
 class BamlHttpStreamRequestClient:
@@ -154,6 +187,13 @@ class BamlHttpStreamRequestClient:
     ) -> baml_py.baml_py.HTTPRequest:
         result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="ExtractMetadata", args={
             "text": text,
+        }, mode="stream")
+        return result
+    def GenerateAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="GenerateAnswer", args={
+            "context": context,"question": question,
         }, mode="stream")
         return result
     

@@ -30,6 +30,12 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractMetadata", llm_response=llm_response, mode="request")
         return typing.cast(types.DynamicMetadata, result)
 
+    def GenerateAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.Answer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateAnswer", llm_response=llm_response, mode="request")
+        return typing.cast(types.Answer, result)
+
     
 
 class LlmStreamParser:
@@ -43,5 +49,11 @@ class LlmStreamParser:
     ) -> stream_types.DynamicMetadata:
         result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractMetadata", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.DynamicMetadata, result)
+
+    def GenerateAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.Answer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateAnswer", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.Answer, result)
 
     
