@@ -11,7 +11,7 @@ license = "MIT"
 repository = "https://github.com/avnlp/rag-pipelines"
 requires-python = ">=3.12"
 dependencies = [
-    "datasets",
+    "datasets>=4.0.0",
     "langchain-core",
     "langgraph",
     "langchain-community",
