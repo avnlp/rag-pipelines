@@ -1,23 +1,25 @@
 """Process and Index the FinanceBench dataset."""
 
+import asyncio
 import os
 from pathlib import Path
 
 import fsspec
 import yaml
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_milvus import BM25BuiltInFunction, Milvus
 
 from rag_pipelines.utils import (
-    MetadataExtractor,
+    EnrichmentConfig,
+    EnrichmentMode,
+    MetadataEnricher,
     UnstructuredChunker,
     UnstructuredDocumentLoader,
 )
 
 
-def main() -> None:
+async def main() -> None:
     """Process and Index the FinanceBench dataset."""
     # Load environment variables
     load_dotenv()
@@ -26,14 +28,8 @@ def main() -> None:
     with open("financebench_indexing_config.yml", "r") as f:
         config = yaml.safe_load(f)
 
-    # Initialize LLM
-    llm_cfg = config["llm"]
-    extractor_llm = ChatGroq(
-        model=llm_cfg["model"],
-        temperature=llm_cfg["temperature"],
-        max_tokens=llm_cfg["max_tokens"],
-        max_retries=llm_cfg["max_retries"],
-    )
+    # Get the JSON schema definition from config
+    metadata_schema = config.get("metadata_schema", {})
 
     # Initialize embeddings
     embedding_cfg = config["embedding"]
@@ -96,21 +92,28 @@ def main() -> None:
     )
     chunked_documents = chunker.transform_documents(documents)
 
-    # Extract metadata
-    metadata_schema = config["metadata_schema"]
-    metadata_extractor = MetadataExtractor(llm=extractor_llm)
-    transformed_documents = metadata_extractor.transform_documents(
-        chunked_documents, metadata_schema
+    # Enrich metadata using MetadataEnricher
+    # With three layers: structural, user-defined schema, and RAG-optimized fields
+    enricher_cfg = config.get("metadata_enricher", {})
+    enrichment_config = EnrichmentConfig(
+        mode=EnrichmentMode(enricher_cfg.get("mode", "full")),
+        batch_size=enricher_cfg.get("batch_size", 10),
+    )
+    metadata_enricher = MetadataEnricher(enrichment_config)
+    transformed_documents = await metadata_enricher.atransform_documents(
+        chunked_documents,
+        metadata_schema,
     )
 
-    # Fill missing metadata fields
-    expected_fields = set(metadata_schema["properties"].keys())
-    default_value = config["metadata_defaults"]["default_value"]
-
-    for doc in transformed_documents:
-        for field in expected_fields:
-            if field not in doc.metadata:
-                doc.metadata[field] = default_value
+    # Apply default values for missing metadata fields
+    metadata_defaults = config.get("metadata_defaults", {})
+    default_value = metadata_defaults.get("default_value", "")
+    if default_value:
+        metadata_schema_properties = metadata_schema.get("properties", {})
+        for doc in transformed_documents:
+            for field_name in metadata_schema_properties:
+                if field_name not in doc.metadata:
+                    doc.metadata[field_name] = default_value
 
     # Index into Milvus
     vectorstore_config = config["vectorstore"]
@@ -131,4 +134,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

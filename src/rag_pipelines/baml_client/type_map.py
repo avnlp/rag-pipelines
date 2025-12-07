@@ -22,5 +22,8 @@ type_map = {
     "types.DynamicMetadata": types.DynamicMetadata,
     "stream_types.DynamicMetadata": stream_types.DynamicMetadata,
 
+    "types.FinanceBenchAnswer": types.FinanceBenchAnswer,
+    "stream_types.FinanceBenchAnswer": stream_types.FinanceBenchAnswer,
+
 
 }

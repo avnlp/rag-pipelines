@@ -119,6 +119,20 @@ class BamlSyncClient:
                 "context": context,"question": question,
             })
             return typing.cast(types.Answer, result.cast_to(types, types, stream_types, False, __runtime__))
+    def GenerateFinanceBenchAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> types.FinanceBenchAnswer:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            stream = self.stream.GenerateFinanceBenchAnswer(context=context,question=question,
+                baml_options=baml_options)
+            return stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = self.__options.merge_options(baml_options).call_function_sync(function_name="GenerateFinanceBenchAnswer", args={
+                "context": context,"question": question,
+            })
+            return typing.cast(types.FinanceBenchAnswer, result.cast_to(types, types, stream_types, False, __runtime__))
     
 
 
@@ -152,6 +166,18 @@ class BamlStreamClient:
           lambda x: typing.cast(types.Answer, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
+    def GenerateFinanceBenchAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlSyncStream[stream_types.FinanceBenchAnswer, types.FinanceBenchAnswer]:
+        ctx, result = self.__options.merge_options(baml_options).create_sync_stream(function_name="GenerateFinanceBenchAnswer", args={
+            "context": context,"question": question,
+        })
+        return baml_py.BamlSyncStream[stream_types.FinanceBenchAnswer, types.FinanceBenchAnswer](
+          result,
+          lambda x: typing.cast(stream_types.FinanceBenchAnswer, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.FinanceBenchAnswer, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
     
 
 class BamlHttpRequestClient:
@@ -174,6 +200,13 @@ class BamlHttpRequestClient:
             "context": context,"question": question,
         }, mode="request")
         return result
+    def GenerateFinanceBenchAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="GenerateFinanceBenchAnswer", args={
+            "context": context,"question": question,
+        }, mode="request")
+        return result
     
 
 class BamlHttpStreamRequestClient:
@@ -193,6 +226,13 @@ class BamlHttpStreamRequestClient:
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="GenerateAnswer", args={
+            "context": context,"question": question,
+        }, mode="stream")
+        return result
+    def GenerateFinanceBenchAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = self.__options.merge_options(baml_options).create_http_request_sync(function_name="GenerateFinanceBenchAnswer", args={
             "context": context,"question": question,
         }, mode="stream")
         return result

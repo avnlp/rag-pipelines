@@ -4,12 +4,11 @@ dataset:
   org: "patronus-ai"
   repo: "financebench"
 
-# LLM configuration for metadata extraction
-llm:
-  model: "llama-3.3-70b-versatile"
-  temperature: 0
-  max_tokens: 1000
-  max_retries: 3
+# BAML configuration
+baml:
+  metadata_function: "ExtractFinanceBenchMetadata"
+
+
 
 # Embedding model
 embedding:

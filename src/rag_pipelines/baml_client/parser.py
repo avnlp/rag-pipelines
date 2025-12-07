@@ -36,6 +36,12 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateAnswer", llm_response=llm_response, mode="request")
         return typing.cast(types.Answer, result)
 
+    def GenerateFinanceBenchAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.FinanceBenchAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateFinanceBenchAnswer", llm_response=llm_response, mode="request")
+        return typing.cast(types.FinanceBenchAnswer, result)
+
     
 
 class LlmStreamParser:
@@ -55,5 +61,11 @@ class LlmStreamParser:
     ) -> stream_types.Answer:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateAnswer", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.Answer, result)
+
+    def GenerateFinanceBenchAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.FinanceBenchAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateFinanceBenchAnswer", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.FinanceBenchAnswer, result)
 
     

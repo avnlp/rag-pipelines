@@ -20,19 +20,7 @@ metadata_schema:
       type: "string"
       description: "Year of the earnings call (e.g., 2022, 2023, 2024)"
 
-# LLM configurations
-llm:
-  extractor:
-    model: "llama-3.3-70b-versatile"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-  response:
-    model: "qwen/qwen3-32b"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-    reasoning_format: "parsed"
+
 
 # Embedding model
 embedding:
@@ -53,14 +41,6 @@ vectorstore:
 # Retriever
 retriever:
   k: 5
-
-# RAG prompt
-prompt:
-  system_message: |
-    You are an expert financial analyst. Use the retrieved context
-    to answer the question precisely. Provide a detailed and accurate
-    answer based on the provided context.
-  human_message: "Context:\n{context}\n\nQuestion: {question}"
 
 # Evaluation metrics thresholds and models
 metrics:
