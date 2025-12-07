@@ -32,7 +32,7 @@ class FixedSchemaEnricher:
         """
         self.baml_client = baml_client
 
-    @cached(cache=_fixed_cache)  # type: ignore[misc]
+    @cached(cache=_fixed_cache)  # type: ignore[untyped-decorator, misc]
     async def extract(self, text: str) -> Dict[str, Any]:
         """Extract RAG-optimized fixed fields from text.
 

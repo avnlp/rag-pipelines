@@ -50,7 +50,7 @@ class DynamicSchemaEnricher:
         """
         self.baml_client = baml_client
 
-    @cached(cache=_dynamic_cache, key=_make_schema_key)  # type: ignore[misc]
+    @cached(cache=_dynamic_cache, key=_make_schema_key)  # type: ignore[untyped-decorator, misc]
     async def extract(self, text: str, user_schema: Dict[str, Any]) -> Dict[str, Any]:
         """Extract user-defined metadata fields from text.
 
