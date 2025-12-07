@@ -124,6 +124,21 @@ class BamlAsyncClient:
                 "context": context,"question": question,
             })
             return typing.cast(types.FinanceBenchAnswer, result.cast_to(types, types, stream_types, False, __runtime__))
+    async def GenerateMedCaseReasoningAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> types.MedCaseReasoningAnswer:
+        # Check if on_tick is provided
+        if 'on_tick' in baml_options:
+            # Use streaming internally when on_tick is provided
+            stream = self.stream.GenerateMedCaseReasoningAnswer(context=context,question=question,
+                baml_options=baml_options)
+            return await stream.get_final_response()
+        else:
+            # Original non-streaming code
+            result = await self.__options.merge_options(baml_options).call_function_async(function_name="GenerateMedCaseReasoningAnswer", args={
+                "context": context,"question": question,
+            })
+            return typing.cast(types.MedCaseReasoningAnswer, result.cast_to(types, types, stream_types, False, __runtime__))
     
 
 
@@ -169,6 +184,18 @@ class BamlStreamClient:
           lambda x: typing.cast(types.FinanceBenchAnswer, x.cast_to(types, types, stream_types, False, __runtime__)),
           ctx,
         )
+    def GenerateMedCaseReasoningAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.BamlStream[stream_types.MedCaseReasoningAnswer, types.MedCaseReasoningAnswer]:
+        ctx, result = self.__options.merge_options(baml_options).create_async_stream(function_name="GenerateMedCaseReasoningAnswer", args={
+            "context": context,"question": question,
+        })
+        return baml_py.BamlStream[stream_types.MedCaseReasoningAnswer, types.MedCaseReasoningAnswer](
+          result,
+          lambda x: typing.cast(stream_types.MedCaseReasoningAnswer, x.cast_to(types, types, stream_types, True, __runtime__)),
+          lambda x: typing.cast(types.MedCaseReasoningAnswer, x.cast_to(types, types, stream_types, False, __runtime__)),
+          ctx,
+        )
     
 
 class BamlHttpRequestClient:
@@ -198,6 +225,13 @@ class BamlHttpRequestClient:
             "context": context,"question": question,
         }, mode="request")
         return result
+    async def GenerateMedCaseReasoningAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="GenerateMedCaseReasoningAnswer", args={
+            "context": context,"question": question,
+        }, mode="request")
+        return result
     
 
 class BamlHttpStreamRequestClient:
@@ -224,6 +258,13 @@ class BamlHttpStreamRequestClient:
         baml_options: BamlCallOptions = {},
     ) -> baml_py.baml_py.HTTPRequest:
         result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="GenerateFinanceBenchAnswer", args={
+            "context": context,"question": question,
+        }, mode="stream")
+        return result
+    async def GenerateMedCaseReasoningAnswer(self, context: str,question: str,
+        baml_options: BamlCallOptions = {},
+    ) -> baml_py.baml_py.HTTPRequest:
+        result = await self.__options.merge_options(baml_options).create_http_request_async(function_name="GenerateMedCaseReasoningAnswer", args={
             "context": context,"question": question,
         }, mode="stream")
         return result

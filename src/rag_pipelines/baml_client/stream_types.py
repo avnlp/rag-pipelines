@@ -23,7 +23,7 @@ class StreamState(BaseModel, typing.Generic[StreamStateValueT]):
     value: StreamStateValueT
     state: typing_extensions.Literal["Pending", "Incomplete", "Complete"]
 # #########################################################################
-# Generated classes (3)
+# Generated classes (4)
 # #########################################################################
 
 class Answer(BaseModel):
@@ -36,6 +36,10 @@ class DynamicMetadata(BaseModel):
 class FinanceBenchAnswer(BaseModel):
     chain_of_thought: typing.Optional[str] = None
     summary: typing.Optional[str] = None
+
+class MedCaseReasoningAnswer(BaseModel):
+    chain_of_thought: typing.Optional[str] = None
+    diagnosis: typing.Optional[str] = None
 
 # #########################################################################
 # Generated type aliases (0)
