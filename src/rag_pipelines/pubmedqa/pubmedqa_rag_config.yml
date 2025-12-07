@@ -4,7 +4,7 @@
 dataset:
   path: "qiaojin/PubMedQA"
   split_name: "pqa_artificial"
-  split: "train"
+  split: "train[:2]"
   question_field: "question"
   answer_field: "long_answer"
 
@@ -19,18 +19,18 @@ chunking:
     include_orig_elements: true
     multipage_sections: true
 
-# Metadata schema
+# Metadata schema for PubMedQA
 metadata_schema:
   properties:
     diseases_conditions:
       type: "string"
-      description: "Diseases, disorders, or medical conditions mentioned"
+      description: "Diseases, disorders, or medical conditions mentioned in the text"
     biological_entities:
       type: "string"
-      description: "Genes, proteins, cells, molecules, or biological pathways"
+      description: "Genes, proteins, cells, molecules, or biological pathways studied"
     species:
       type: "string"
-      description: "Species involved (e.g., human, mouse, rat)"
+      description: "Species involved in the study (e.g., human, mouse, rat)"
     study_type:
       type: "string"
       description: "Type of research study design"
@@ -48,37 +48,27 @@ metadata_schema:
       description: "Treatments, interventions, or manipulations performed"
     population_cohort:
       type: "string"
-      description: "Study population or cohort characteristics"
+      description: "Description of study population or cohort characteristics"
     statistical_significance:
       type: "string"
-      description: "Statistical significance of main findings"
+      description: "Overall statistical significance of main findings"
     effect_direction:
       type: "string"
       description: "Direction of main effects reported"
 
 
-# LLM configurations
-llm:
-  extractor:
-    model: "llama-3.3-70b-versatile"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-  response:
-    model: "qwen/qwen3-32b"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-    reasoning_format: "parsed"
 
 # Embedding model
 embedding:
   model_name: "Qwen/Qwen3-Embedding-0.6B"
 
-# Contextual Reranker
+# Contextual Reranker and Hybrid Search Weights
 reranker:
   model: "ContextualAI/ctxl-rerank-v2-instruct-multilingual-1b"
   instruction: "Prioritize Medical articles that directly answer the question."
+  # Weights for hybrid search: [dense_weight, sparse_weight]
+  # Dense (semantic) weight: 0.6, Sparse (keyword) weight: 0.4
+  hybrid_weights: [0.6, 0.4]
 
 # Vector store (Milvus)
 vectorstore:
@@ -90,14 +80,7 @@ vectorstore:
 # Retriever
 retriever:
   k: 5
-
-# RAG prompt
-prompt:
-  system_message: |
-    You are an expert biomedical researcher. Use the retrieved context
-    to answer the question precisely. Provide a detailed and accurate
-    answer based on the provided context.
-  human_message: "Context:\n{context}\n\nQuestion: {question}"
+  rrf_k: 60
 
 # Evaluation metrics thresholds and models
 metrics:
@@ -130,3 +113,13 @@ metrics:
     model: "llama-3.3-70b-versatile"
     include_reason: true
     async_mode: true
+
+# MetadataEnricher configuration
+metadata_enricher:
+  # Enrichment mode: "full" (all layers), "dynamic" (structural + user schema), "minimal" (structural only)
+  # Use "dynamic" for query-time extraction, "full" for document indexing
+  mode: "full"
+  # Batch size for concurrent document enrichment
+  batch_size: 10
+  # LRU cache size for enriched results deduplication
+  cache_size: 1000

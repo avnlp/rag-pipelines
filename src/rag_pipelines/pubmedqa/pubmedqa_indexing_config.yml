@@ -5,36 +5,7 @@
 dataset:
   path: "qiaojin/PubMedQA"
   split_name: "pqa_artificial"
-  split: "train"
-
-# LLM configuration for metadata extraction
-llm:
-  model: "llama-3.3-70b-versatile"
-  temperature: 0
-  max_tokens: 1000
-  max_retries: 3
-
-# Embedding model
-embedding:
-  model_name: "Qwen/Qwen3-Embedding-0.6B"
-
-# Milvus Vector Database settings
-vectorstore:
-  collection_name: "pubmedqa"
-  vector_fields: ["dense", "sparse"]
-  consistency_level: "Strong"
-  drop_old: true
-
-# Unstructured Chunker configuration
-chunking:
-  chunking_strategy: "by_title"
-  max_characters: 1000
-  new_after_n_chars: 100
-  overlap: 50
-  overlap_all: true
-  combine_text_under_n_chars: 100
-  include_orig_elements: true
-  multipage_sections: true
+  split: "train[:2]"
 
 # Metadata schema for PubMedQA
 metadata_schema:
@@ -73,6 +44,37 @@ metadata_schema:
       type: "string"
       description: "Direction of main effects reported"
 
+# Embedding model
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-0.6B"
+
+# Milvus Vector Database settings
+vectorstore:
+  collection_name: "pubmedqa"
+  vector_fields: ["dense", "sparse"]
+  consistency_level: "Strong"
+  drop_old: true
+
+# Unstructured Chunker configuration
+chunking:
+  chunking_strategy: "by_title"
+  max_characters: 1000
+  new_after_n_chars: 100
+  overlap: 50
+  overlap_all: true
+  combine_text_under_n_chars: 100
+  include_orig_elements: true
+  multipage_sections: true
+
 # Default value for missing metadata fields
 metadata_defaults:
   default_value: "not specified"
+
+# MetadataEnricher configuration
+metadata_enricher:
+  # Enrichment mode: "full" (all layers), "dynamic" (structural + user schema), "minimal" (structural only)
+  mode: "full"
+  # Batch size for concurrent document enrichment
+  batch_size: 10
+  # LRU cache size for enriched results deduplication
+  cache_size: 1000

@@ -28,5 +28,8 @@ type_map = {
     "types.MedCaseReasoningAnswer": types.MedCaseReasoningAnswer,
     "stream_types.MedCaseReasoningAnswer": stream_types.MedCaseReasoningAnswer,
 
+    "types.PubMedAnswer": types.PubMedAnswer,
+    "stream_types.PubMedAnswer": stream_types.PubMedAnswer,
+
 
 }

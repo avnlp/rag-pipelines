@@ -48,6 +48,12 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateMedCaseReasoningAnswer", llm_response=llm_response, mode="request")
         return typing.cast(types.MedCaseReasoningAnswer, result)
 
+    def GeneratePubMedAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.PubMedAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GeneratePubMedAnswer", llm_response=llm_response, mode="request")
+        return typing.cast(types.PubMedAnswer, result)
+
     
 
 class LlmStreamParser:
@@ -79,5 +85,11 @@ class LlmStreamParser:
     ) -> stream_types.MedCaseReasoningAnswer:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateMedCaseReasoningAnswer", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.MedCaseReasoningAnswer, result)
+
+    def GeneratePubMedAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.PubMedAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GeneratePubMedAnswer", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.PubMedAnswer, result)
 
     
