@@ -9,44 +9,26 @@ dataset:
   answer_idx_field: "answer_idx"
   options_field: "options"
 
-# Metadata schema for clinical conversations
+# Metadata schema for MetaMedQA
 metadata_schema:
   properties:
-    medical_domain:
+    clinical_specialty:
       type: "string"
-      enum: ["cardiology", "pulmonology", "pediatrics", "congenital_disorders", "general_medicine"]
-      description: "Primary medical specialty relevant to the case"
-    patient_age_group:
+      description: "Medical specialty or department (e.g., cardiology, neurology, emergency medicine)"
+    case_type:
       type: "string"
-      enum: ["neonate", "infant", "child", "adolescent", "adult"]
-      description: "Age group of the patient described"
-    key_findings:
+      description: "Type of clinical scenario (e.g., diagnostic, management, referral, triage)"
+    patient_age:
       type: "string"
-      description: "Most important clinical findings from the case"
-    symptom_context:
+      description: "Patient age group or specific age if mentioned (e.g., '45-year-old', 'elderly', 'pediatric')"
+    patient_gender:
       type: "string"
-      enum: ["feeding", "rest", "exercise", "sleep", "variable"]
-      description: "When the symptoms primarily occur"
-    cardiac_findings_present:
-      type: "boolean"
-      description: "Whether cardiac abnormalities are mentioned in physical exam"
-    congenital_condition_suspected:
-      type: "boolean"
-      description: "Whether this appears to be a congenital condition"
+      description: "Patient gender (e.g., male, female, unspecified)"
+    chief_complaint:
+      type: "string"
+      description: "Primary symptom or reason for encounter"
 
-# LLM configurations
-llm:
-  extractor:
-    model: "llama-3.3-70b-versatile"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-  response:
-    model: "qwen/qwen3-32b"
-    temperature: 0
-    max_tokens: 1000
-    max_retries: 3
-    reasoning_format: "parsed"
+
 
 # Embedding model
 embedding:
@@ -68,30 +50,6 @@ vectorstore:
 retriever:
   k: 5
 
-# RAG prompt
-prompt:
-  system_message: |
-    You are an expert medical educator and diagnostician. Use the retrieved context
-    to analyze the clinical case and identify the most likely answer from the options provided.
-
-    CRITICAL INSTRUCTIONS:
-    1. Base your reasoning SOLELY on the provided medical context
-    2. For medical questions, prioritize the most specific and pathophysiologically relevant information
-    3. Explain the clinical reasoning that connects the patient's presentation to the correct answer
-    4. If multiple options seem plausible, identify which one best explains ALL the clinical findings
-    5. Address why key distractors are less likely based on the clinical context
-
-    Provide your answer in this exact format:
-    **Answer: [LETTER]**
-    **Explanation:** [Your clinical reasoning]
-  human_message: |
-    CLINICAL CONTEXT:
-    {context}
-
-    QUESTION:
-    {question}
-
-    Based on the clinical context above, analyze this case and provide your answer.
 
 # Evaluation metrics with clinical focus
 metrics:

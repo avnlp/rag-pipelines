@@ -28,6 +28,9 @@ type_map = {
     "types.MedCaseReasoningAnswer": types.MedCaseReasoningAnswer,
     "stream_types.MedCaseReasoningAnswer": stream_types.MedCaseReasoningAnswer,
 
+    "types.MetaMedQAAnswer": types.MetaMedQAAnswer,
+    "stream_types.MetaMedQAAnswer": stream_types.MetaMedQAAnswer,
+
     "types.PubMedAnswer": types.PubMedAnswer,
     "stream_types.PubMedAnswer": stream_types.PubMedAnswer,
 

@@ -41,7 +41,7 @@ def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
 # #########################################################################
 
 # #########################################################################
-# Generated classes (5)
+# Generated classes (6)
 # #########################################################################
 
 class Answer(BaseModel):
@@ -58,6 +58,10 @@ class FinanceBenchAnswer(BaseModel):
 class MedCaseReasoningAnswer(BaseModel):
     chain_of_thought: str
     diagnosis: str
+
+class MetaMedQAAnswer(BaseModel):
+    chain_of_thought: str
+    answer: str
 
 class PubMedAnswer(BaseModel):
     chain_of_thought: str

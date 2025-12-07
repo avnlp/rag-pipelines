@@ -1,8 +1,9 @@
 """Evaluation of RAG pipeline on MetaMedQA dataset."""
 
+import asyncio
 import logging
 import os
-from typing import Any
+from typing import Any, Dict, Optional
 
 import yaml
 from datasets import Dataset, load_dataset
@@ -19,17 +20,20 @@ from deepeval.metrics import (
 from deepeval.test_case import LLMTestCase
 from dotenv import load_dotenv
 from langchain_core.documents import Document
-from langchain_core.language_models import BaseChatModel
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.retrievers import BaseRetriever
-from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_milvus import BM25BuiltInFunction, Milvus
 from langgraph.graph import END, StateGraph
 from tqdm import tqdm
 from typing_extensions import TypedDict
 
-from rag_pipelines.utils import ContextualReranker, MetadataExtractor
+from rag_pipelines.baml_client import b
+from rag_pipelines.utils import (
+    ContextualReranker,
+    EnrichmentConfig,
+    EnrichmentMode,
+    MetadataEnricher,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -40,7 +44,8 @@ class RAGState(TypedDict):
 
     Attributes:
         question: The input question from the dataset.
-        metadata_filter: Structured metadata extracted from the question for filtering.
+        metadata: Extracted metadata dictionary from the query.
+        metadata_filter: Milvus filter expression string for metadata-based filtering.
         retrieved_docs: List of Document objects retrieved from the vector store.
         retrieved_context: List of raw text strings from retrieved documents.
         context: Concatenated string of retrieved context, separated by newlines.
@@ -50,7 +55,8 @@ class RAGState(TypedDict):
     """
 
     question: str
-    metadata_filter: dict[str, Any]
+    metadata: dict[str, Any]
+    metadata_filter: Optional[str]
     retrieved_docs: list[Document]
     retrieved_context: list[str]
     context: str
@@ -59,68 +65,105 @@ class RAGState(TypedDict):
     evaluation_scores: dict[str, Any]
 
 
-class MetadataExtractionNode:
-    """Node responsible for extracting structured metadata from the input question.
+class MetadataEnrichmentNode:
+    """Node responsible for extracting structured metadata from the query.
 
-    This node uses an LLM-powered extractor to parse the question and produce
-    a structured filter dictionary based on a predefined schema. The output is
-    used to constrain document retrieval to relevant subsets (e.g., by publication year,
-    study type, etc.).
+    Uses MetadataEnricher for fast query-time metadata extraction with DYNAMIC
+    enrichment mode (structural + user-defined schema extraction).
+
+    Converts extracted metadata into Milvus filter expressions for semantic search
+    refinement. This enables filtering retrieved documents by user-specified fields
+    extracted from the query.
     """
 
-    def __init__(self, extractor: MetadataExtractor, schema: dict[str, Any]) -> None:
-        """Initialize the metadata extraction node.
+    def __init__(self, enricher: MetadataEnricher, schema: Dict[str, Any]) -> None:
+        """Initialize the metadata enrichment node.
 
         Args:
-            extractor: An instance of MetadataExtractor capable of structured output.
-            schema: JSON schema defining expected metadata fields and types.
+            enricher: An instance of MetadataEnricher for dynamic schema
+                extraction.
+            schema: The JSON schema dictionary defining the metadata to extract.
         """
-        self.extractor = extractor
+        self.enricher = enricher
         self.schema = schema
 
-    def __call__(self, state: RAGState) -> RAGState:
-        """Invoke metadata extraction on the current question.
+    async def __call__(self, state: RAGState) -> RAGState:
+        """Extract metadata from the query using fast DYNAMIC mode.
 
         Args:
-            state: Current RAG state containing at least the 'question' key.
+            state: Current RAG state.
 
         Returns:
-            Updated state with 'metadata_filter' populated.
+            Updated state with metadata and metadata_filter.
         """
         question = state["question"]
-        metadata_filter = self.extractor.invoke(question, self.schema)
-        return {**state, "metadata_filter": metadata_filter}
+        metadata_dict, milvus_filter = await self.enricher.extract_query_metadata(
+            query=question, user_schema=self.schema
+        )
+        return {**state, "metadata": metadata_dict, "metadata_filter": milvus_filter}
 
 
 class DocumentRetrievalNode:
-    """Node that retrieves relevant documents using a configured retriever.
+    """Node that retrieves relevant documents using hybrid search with reranking.
 
     Applies optional metadata filtering (from prior node) during retrieval.
-    Converts retrieved Document objects into both raw Document list and
-    plain text list for downstream use.
+    Uses weighted hybrid search combining dense (semantic) and sparse (BM25
+    keyword) retrieval strategies, then reranks results. Converts retrieved
+    Document objects into both raw Document list and plain text list.
     """
 
-    def __init__(self, retriever: BaseRetriever) -> None:
+    def __init__(
+        self,
+        retriever: BaseRetriever,
+        vectorstore: Any = None,
+        k: int = 5,
+        rrf_k: int = 60,
+    ) -> None:
         """Initialize the document retrieval node.
 
         Args:
             retriever: A LangChain retriever instance (e.g., from Milvus).
+            vectorstore: The underlying Milvus vectorstore (optional, for
+                hybrid search with metadata filters and RRF reranking).
+            k: Number of documents to retrieve. Default is 5.
+            rrf_k: RRF (Reciprocal Rank Fusion) parameter. Default is 60.
         """
         self.retriever = retriever
+        self.vectorstore = vectorstore
+        self.k = k
+        self.rrf_k = rrf_k
 
     def __call__(self, state: RAGState) -> RAGState:
-        """Retrieve documents based on question and optional metadata filter.
+        """Retrieve documents using hybrid search with RRF reranking.
+
+        Uses hybrid search combining dense (semantic) and sparse
+        (keyword-based BM25) retrieval. Applies optional metadata filtering
+        and reranks results using RRF (Reciprocal Rank Fusion).
 
         Args:
             state: Current RAG state containing 'question' and optionally
-                'metadata_filter'.
+                'metadata_filter' (Milvus filter expression).
 
         Returns:
             Updated state with 'retrieved_docs', 'retrieved_context', and 'context'.
         """
         question = state["question"]
-        metadata_filter = state.get("metadata_filter", {})
-        retrieved_docs = self.retriever.invoke(question, filter=metadata_filter)
+        metadata_filter = state.get("metadata_filter")
+
+        if self.vectorstore is not None:
+            # Use vectorstore directly for hybrid search with weighted reranking
+            # Combines dense (semantic) and sparse (BM25 keyword) search
+            retrieved_docs = self.vectorstore.similarity_search(
+                question,
+                k=self.k,
+                expr=metadata_filter if metadata_filter else None,
+                ranker_type="rrf",
+                ranker_params={"rrf_k": self.rrf_k},
+            )
+        else:
+            # Fall back to configured retriever (no hybrid search)
+            retrieved_docs = self.retriever.invoke(question)
+
         retrieved_context = [doc.page_content for doc in retrieved_docs]
         context_text = "\n\n".join(retrieved_context)
         return {
@@ -158,37 +201,35 @@ class DocumentRerankerNode:
 
 
 class AnswerGenerationNode:
-    """Node that generates an answer using an LLM conditioned on retrieved context.
+    """Node that generates a structured answer using a BAML function.
 
-    Uses a pre-defined prompt template that injects the context and question
-    into the LLM call. The output is the raw string response from the model.
+    This node is responsible for calling the BAML-defined `GenerateMetaMedQAAnswer`
+    function, which encapsulates the LLM prompt, client, and output parsing.
     """
 
-    def __init__(self, llm: BaseChatModel, prompt_template: ChatPromptTemplate) -> None:
-        """Initialize the answer generation node.
+    async def __call__(self, state: RAGState) -> RAGState:
+        """Generate answer by invoking the BAML `GenerateMetaMedQAAnswer` function.
+
+        This method retrieves the question and context from the state,
+        calls the BAML function, and extracts the final answer from the
+        structured response.
 
         Args:
-            llm: A LangChain chat model (e.g., ChatGroq).
-            prompt_template: A ChatPromptTemplate with placeholders for 'context'
-                            and 'question'.
-        """
-        self.llm = llm
-        self.prompt_template = prompt_template
-        self.chain = prompt_template | llm
-
-    def __call__(self, state: RAGState) -> RAGState:
-        """Generate an answer using the LLM and retrieved context.
-
-        Args:
-            state: Current RAG state containing 'question' and 'context'.
+            state: The current state of the RAG pipeline.
 
         Returns:
-            Updated state with 'response' populated from the LLM output.
+            The updated state with the generated `response`.
         """
         question = state["question"]
         context_text = state.get("context", "")
-        result = self.chain.invoke({"context": context_text, "question": question})
-        response = str(result.content)
+
+        baml_response = await b.GenerateMetaMedQAAnswer(
+            context=context_text, question=question
+        )
+
+        # The response from BAML is a structured object (`MetaMedQAAnswer` class),
+        # The final answer is stored in the answer field
+        response = baml_response.answer
         return {**state, "response": response}
 
 
@@ -241,18 +282,19 @@ class EvaluationNode:
         return {**state, "evaluation_scores": evaluation_scores}
 
 
-def main() -> None:
+async def main() -> None:
     """Run MetaMedQA RAG pipeline evaluation.
 
     Loads configuration, initializes components (LLMs, embeddings, vector store,
-    retriever, metrics, prompt), builds a LangGraph workflow, and evaluates
-    the pipeline on a sample of the MetaMedQA dataset.
+    retriever, metrics), builds a LangGraph workflow, and evaluates
+    the pipeline on the MetaMedQA dataset.
 
-    The pipeline consists of four sequential nodes:
-        1. Metadata extraction (for filtered retrieval)
+    The pipeline consists of five sequential nodes:
+        1. Metadata enrichment (fast query-time extraction for filtering)
         2. Document retrieval (with optional metadata filtering)
-        3. Answer generation (using retrieved context)
-        4. Evaluation (using DeepEval metrics)
+        3. Document reranking (based on relevance to query)
+        4. Answer generation (using retrieved context)
+        5. Evaluation (using DeepEval metrics)
 
     The pipeline is traced using Confident AI.
     """
@@ -264,13 +306,13 @@ def main() -> None:
 
     # Extract config sections
     dataset_config = config["dataset"]
-    llm_config = config["llm"]
     embedding_config = config["embedding"]
     vectorstore_config = config["vectorstore"]
     retriever_config = config["retriever"]
-    prompt_config = config["prompt"]
     metrics_config = config["metrics"]
-    metadata_schema = config["metadata_schema"]
+
+    # Extract the JSON schema definition from config
+    metadata_schema = config.get("metadata_schema", {})
 
     # Load MetaMedQA dataset
     logger.info(f"Loading dataset: {dataset_config['path']}")
@@ -280,21 +322,13 @@ def main() -> None:
         split=dataset_config["split"],
     )
 
-    extractor_llm = ChatGroq(
-        model=llm_config["extractor"]["model"],
-        temperature=llm_config["extractor"]["temperature"],
-        max_tokens=llm_config["extractor"]["max_tokens"],
-        max_retries=llm_config["extractor"]["max_retries"],
+    # Initialize MetadataEnricher
+    enricher_cfg = config.get("metadata_enricher", {})
+    enrichment_config = EnrichmentConfig(
+        mode=EnrichmentMode(enricher_cfg.get("mode", "dynamic")),
+        batch_size=enricher_cfg.get("batch_size", 10),
     )
-    metadata_extractor = MetadataExtractor(llm=extractor_llm)
-
-    response_llm = ChatGroq(
-        model=llm_config["response"]["model"],
-        temperature=llm_config["response"]["temperature"],
-        max_tokens=llm_config["response"]["max_tokens"],
-        max_retries=llm_config["response"]["max_retries"],
-        reasoning_format=llm_config["response"]["reasoning_format"],
-    )
+    metadata_enricher = MetadataEnricher(enrichment_config)
 
     # Initialize embedding model
     embeddings = HuggingFaceEmbeddings(model_name=embedding_config["model_name"])
@@ -318,8 +352,8 @@ def main() -> None:
 
     # Initialize Contextual Reranker
     reranker = ContextualReranker(
-        model_path=llm_config["reranker"]["model"],
-        instruction=llm_config["reranker"]["instruction"],
+        model_path=config["reranker"]["model"],
+        instruction=config["reranker"]["instruction"],
     )
 
     # Initialize Evaluation metrics
@@ -333,22 +367,20 @@ def main() -> None:
     answer_relevancy = AnswerRelevancyMetric(**metrics_config["answer_relevancy"])
     faithfulness = FaithfulnessMetric(**metrics_config["faithfulness"])
 
-    # Construct RAG prompt
-    rag_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", prompt_config["system_message"].strip()),
-            ("human", prompt_config["human_message"]),
-        ]
-    )
-
     # Build LangGraph workflow
     workflow = StateGraph(RAGState)
     workflow.add_node(
-        "extract_metadata", MetadataExtractionNode(metadata_extractor, metadata_schema)
+        "enrich_metadata",
+        MetadataEnrichmentNode(metadata_enricher, metadata_schema),
     )
-    workflow.add_node("retrieve_documents", DocumentRetrievalNode(retriever))
+    k = retriever_config.get("k", 5)
+    rrf_k = retriever_config.get("rrf_k", 60)
+    workflow.add_node(
+        "retrieve_documents",
+        DocumentRetrievalNode(retriever, vectorstore, k, rrf_k),
+    )
     workflow.add_node("document_reranker", DocumentRerankerNode(reranker))
-    workflow.add_node("generate_answer", AnswerGenerationNode(response_llm, rag_prompt))
+    workflow.add_node("generate_answer", AnswerGenerationNode())
     workflow.add_node(
         "evaluate",
         EvaluationNode(
@@ -363,8 +395,8 @@ def main() -> None:
     )
 
     # Define execution flow
-    workflow.set_entry_point("extract_metadata")
-    workflow.add_edge("extract_metadata", "retrieve_documents")
+    workflow.set_entry_point("enrich_metadata")
+    workflow.add_edge("enrich_metadata", "retrieve_documents")
     workflow.add_edge("retrieve_documents", "document_reranker")
     workflow.add_edge("document_reranker", "generate_answer")
     workflow.add_edge("generate_answer", "evaluate")
@@ -388,19 +420,20 @@ def main() -> None:
         initial_state: RAGState = {
             "question": question + "\n\n" + question_choices,
             "answer": str(choice_idx) + answer,
-            "metadata_filter": {},
+            "metadata": {},
+            "metadata_filter": None,
             "retrieved_docs": [],
             "retrieved_context": [],
             "context": "",
             "response": "",
             "evaluation_scores": {},
         }
-        result = rag_pipeline.invoke(
-            initial_state,  # type: ignore[arg-type]
+        result = await rag_pipeline.ainvoke(
+            initial_state,
             config={"callbacks": [CallbackHandler()]},
         )
         print(result)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

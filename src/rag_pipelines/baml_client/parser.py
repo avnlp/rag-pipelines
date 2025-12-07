@@ -48,6 +48,12 @@ class LlmResponseParser:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateMedCaseReasoningAnswer", llm_response=llm_response, mode="request")
         return typing.cast(types.MedCaseReasoningAnswer, result)
 
+    def GenerateMetaMedQAAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.MetaMedQAAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateMetaMedQAAnswer", llm_response=llm_response, mode="request")
+        return typing.cast(types.MetaMedQAAnswer, result)
+
     def GeneratePubMedAnswer(
         self, llm_response: str, baml_options: BamlCallOptions = {},
     ) -> types.PubMedAnswer:
@@ -85,6 +91,12 @@ class LlmStreamParser:
     ) -> stream_types.MedCaseReasoningAnswer:
         result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateMedCaseReasoningAnswer", llm_response=llm_response, mode="stream")
         return typing.cast(stream_types.MedCaseReasoningAnswer, result)
+
+    def GenerateMetaMedQAAnswer(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.MetaMedQAAnswer:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="GenerateMetaMedQAAnswer", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.MetaMedQAAnswer, result)
 
     def GeneratePubMedAnswer(
         self, llm_response: str, baml_options: BamlCallOptions = {},
