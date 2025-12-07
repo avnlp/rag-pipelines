@@ -16,5 +16,8 @@ from . import stream_types
 
 type_map = {
 
+    "types.DynamicMetadata": types.DynamicMetadata,
+    "stream_types.DynamicMetadata": stream_types.DynamicMetadata,
+
 
 }

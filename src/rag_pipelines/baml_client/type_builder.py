@@ -20,7 +20,7 @@ from .globals import DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIM
 class TypeBuilder(type_builder.TypeBuilder):
     def __init__(self):
         super().__init__(classes=set(
-          []
+          ["DynamicMetadata",]
         ), enums=set(
           []
         ), runtime=DO_NOT_USE_DIRECTLY_UNLESS_YOU_KNOW_WHAT_YOURE_DOING_RUNTIME)
@@ -31,8 +31,12 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
     # #########################################################################
-    # Generated classes 0
+    # Generated classes 1
     # #########################################################################
+
+    @property
+    def DynamicMetadata(self) -> "DynamicMetadataBuilder":
+        return DynamicMetadataBuilder(self)
 
 
 
@@ -42,5 +46,57 @@ class TypeBuilder(type_builder.TypeBuilder):
 
 
 # #########################################################################
-# Generated classes 0
+# Generated classes 1
 # #########################################################################
+
+class DynamicMetadataAst:
+    def __init__(self, tb: type_builder.TypeBuilder):
+        _tb = tb._tb # type: ignore (we know how to use this private attribute)
+        self._bldr = _tb.class_("DynamicMetadata")
+        self._properties: typing.Set[str] = set([  ])
+        self._props = DynamicMetadataProperties(self._bldr, self._properties)
+
+    def type(self) -> baml_py.FieldType:
+        return self._bldr.field()
+
+    @property
+    def props(self) -> "DynamicMetadataProperties":
+        return self._props
+
+
+class DynamicMetadataBuilder(DynamicMetadataAst):
+    def __init__(self, tb: type_builder.TypeBuilder):
+        super().__init__(tb)
+
+    
+    def add_property(self, name: str, type: baml_py.FieldType) -> baml_py.ClassPropertyBuilder:
+        if name in self._properties:
+            raise ValueError(f"Property {name} already exists.")
+        return self._bldr.property(name).type(type)
+
+    def list_properties(self) -> typing.List[typing.Tuple[str, baml_py.ClassPropertyBuilder]]:
+        return self._bldr.list_properties()
+
+    def remove_property(self, name: str) -> None:
+        self._bldr.remove_property(name)
+
+    def reset(self) -> None:
+        self._bldr.reset()
+
+    
+
+
+class DynamicMetadataProperties:
+    def __init__(self, bldr: baml_py.ClassBuilder, properties: typing.Set[str]):
+        self.__bldr = bldr
+        self.__properties = properties # type: ignore (we know how to use this private attribute) # noqa: F821
+
+    
+    def __getattr__(self, name: str) -> baml_py.ClassPropertyBuilder:
+        if name not in self.__properties:
+            raise AttributeError(f"Property {name} not found.")
+        return self.__bldr.property(name)
+
+    
+    
+

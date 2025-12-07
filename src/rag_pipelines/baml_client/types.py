@@ -41,8 +41,11 @@ def all_succeeded(checks: typing.Dict[CheckName, Check]) -> bool:
 # #########################################################################
 
 # #########################################################################
-# Generated classes (0)
+# Generated classes (1)
 # #########################################################################
+
+class DynamicMetadata(BaseModel):
+    model_config = ConfigDict(extra='allow')
 
 # #########################################################################
 # Generated type aliases (0)

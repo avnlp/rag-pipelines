@@ -24,6 +24,12 @@ class LlmResponseParser:
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
 
+    def ExtractMetadata(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> types.DynamicMetadata:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractMetadata", llm_response=llm_response, mode="request")
+        return typing.cast(types.DynamicMetadata, result)
+
     
 
 class LlmStreamParser:
@@ -31,5 +37,11 @@ class LlmStreamParser:
 
     def __init__(self, options: DoNotUseDirectlyCallManager):
         self.__options = options
+
+    def ExtractMetadata(
+        self, llm_response: str, baml_options: BamlCallOptions = {},
+    ) -> stream_types.DynamicMetadata:
+        result = self.__options.merge_options(baml_options).parse_response(function_name="ExtractMetadata", llm_response=llm_response, mode="stream")
+        return typing.cast(stream_types.DynamicMetadata, result)
 
     
