@@ -14,9 +14,11 @@ This repository contains advanced Retrieval-Augmented Generation (RAG) pipelines
 
 The RAG pipelines follow a standardized architecture:
 
-- [**LangGraph**](https://www.langchain.com/langgraph) for workflow orchestration.
-- [**Unstructured**](https://unstructured.io/) for document processing.
-- [**Milvus**](https://milvus.io/) vector database for hybrid search and retrieval.
+- [**LangGraph**](https://www.langchain.com/langgraph) for async workflow orchestration.
+- [**BAML**](https://www.boundaryml.com/) for robust, structured outputs generation with multi-provider fallback.
+- [**Unstructured**](https://unstructured.io/) for document processing and chunking.
+- [**Milvus**](https://milvus.io/) vector database with hybrid search (dense + BM25) and Reciprocal Rank Fusion.
+- [**Contextual AI**](https://contextual.ai/) instruction-following reranker models for neural document reranking.
 - [**DeepEval**](https://deepeval.com/) for comprehensive evaluation metrics.
 - [**Confident AI**](https://www.confident-ai.com/) for tracing and debugging.
 
@@ -35,53 +37,87 @@ The project includes several domain-specific datasets:
 
 ## Pipeline Architecture
 
-Each pipeline follows a consistent architecture with the following nodes:
+Each pipeline follows a consistent architecture split into two stages:
 
-- **Indexing**: Processes raw documents from the dataset, chunks them using unstructured.io data processors, extracts metadata using LLM-powered extraction, and stores them in a Milvus vector database with BM25 hybrid search capability. The indexing process also applies metadata schemas to ensure consistent metadata across documents.
+### Indexing Pipeline
 
-- **Metadata Extraction**: Uses an LLM-powered extractor to parse the input question and produce a structured filter dictionary based on a predefined JSON schema. This output is used to constrain document retrieval to relevant subsets (e.g., by publication year, study type, etc.) to improve retrieval precision.
+The indexing pipeline is an offline process run once per dataset to prepare the vector store:
 
-- **Document Retrieval**: Retrieves relevant documents using a configured retriever (typically from Milvus vector store) based on the input question and optional metadata filter from the previous step. The retrieved documents are converted into both raw Document objects and plain text for downstream use.
+1. Load the dataset from Hugging Face Hub (or from PDF files for financial documents).
+2. Chunk documents using configurable strategies from the Unstructured library.
+3. Enrich each chunk with all three metadata layers (structural, dynamic, and fixed) via the Metadata Enricher.
+4. Store the enriched chunks in a Milvus vector database with both dense and sparse (BM25) indexing for hybrid search.
 
-- **Document Reranking**: Reranks the retrieved documents based on their relevance to the query using a specialized contextual reranker model. This step improves the relevance of documents used for answer generation by reordering them according to their contextual similarity to the query.
+### RAG Evaluation Pipeline
 
-- **Answer Generation**: Generates an answer using an LLM conditioned on the retrieved context. This node uses a pre-defined prompt template that injects the context and question into the LLM call, producing a raw string response that forms the final answer.
+The RAG evaluation pipeline is orchestrated by LangGraph and consists of the following nodes:
 
-- **Evaluation**: Evaluates the generated response against the ground truth using DeepEval metrics. This node constructs an LLMTestCase from the ground truth, generated answer, and retrieved context, then runs a suite of pre-configured metrics including contextual recall, precision, relevancy, answer relevancy, and faithfulness.
+- **Metadata Enrichment**: Parses the input question to extract structured metadata and generate a filter expression for the vector database. This narrows retrieval to relevant document subsets (e.g., by clinical specialty, company, year).
+
+- **Document Retrieval**: Performs hybrid search combining dense (semantic) and sparse (BM25) retrieval, merged via Reciprocal Rank Fusion (RRF). Optionally applies metadata filters from the enrichment step to improve retrieval precision.
+
+- **Document Reranking**: Reranks retrieved documents using a neural reranker model, with domain-specific instructions to prioritize the most relevant content for the query.
+
+- **Answer Generation**: Generates a structured answer using a BAML-defined LLM function. Each domain pipeline has its own prompt template and typed output schema, ensuring the response includes a chain-of-thought explanation alongside the final answer.
+
+- **Evaluation**: Scores the generated response against ground truth using a suite of metrics including contextual recall, contextual precision, contextual relevancy, answer relevancy, and faithfulness.
 
 ## Components
 
 ### Contextual Ranker
 
-The ContextualReranker uses the reranker models by [Contextual AI](https://contextual.ai/blog/introducing-instruction-following-reranker) to reorder documents based on their relevance to a given query.
+The Contextual Ranker uses instruction-following reranker models by [Contextual AI](https://contextual.ai/blog/introducing-instruction-following-reranker) to reorder documents based on their relevance to a given query.
 
-- Uses the contextual-rerank models from HuggingFace for reranking.
-- Supports custom instructions to refine query context during reranking.
+- Uses instruction-following reranker models from HuggingFace for neural reranking.
+- Supports per-domain custom instructions to guide the reranker (e.g., prioritizing medical articles or financial documents).
+- Automatic GPU detection with optimized precision settings for efficient inference.
 - Uses model logits for scoring document relevance.
-- Preserves document metadata during reranking.
+- Preserves all document metadata through the reranking process.
 
-### Metadata Extractor
+### Metadata Enricher
 
-The MetadataExtractor extracts structured metadata from text using a language model and a user specified JSON schema.
+The Metadata Enricher automatically enriches documents and queries with structured metadata using a three-layer architecture designed for cost/quality tradeoffs.
 
-- Uses LLMs with structured-output generation for metadata extraction.
-- Dynamically converts JSON schema into Pydantic models for type safety and validation.
-- Only includes successfully extracted (non-null) fields in results.
-- Supports string, number, and boolean field types with optional enums.
+**Three-layer enrichment:**
+
+1. **Structural (Layer 1)**: Rule-based extraction with zero LLM cost - content hashing, word/character counts, language detection, page numbers, section titles, and heading hierarchy.
+2. **Dynamic (Layer 2)**: User-defined fields extracted via a language model. Supports string, number, boolean, and enum field types. The schema is specified per-pipeline in the YAML configuration.
+3. **Fixed (Layer 3)**: RAG-optimized fields automatically generated by the LLM - potential questions the chunk answers, a concise summary, keywords, content type classification, and a descriptive header.
+
+**Key capabilities:**
+
+- Three enrichment modes (minimal, dynamic, full) allowing pipelines to balance LLM cost against metadata richness.
+- Multi-level caching using content hashes to avoid redundant LLM calls, with concurrent request deduplication.
+- Query-time metadata extraction that parses the input question and produces both a metadata dictionary and a vector database filter expression for constrained retrieval.
+- Batch async processing with configurable batch sizes for parallel document enrichment.
 
 ### Unstructured Document Loaders and Chunker
 
-**UnstructuredAPIDocumentLoader**: Loads and transforms documents using the Unstructured API. It supports extracting text, tables, and images from various document formats.
+The project includes document loading and chunking utilities built on the [Unstructured](https://unstructured.io/) library:
 
-**UnstructuredDocumentLoader**: Loads and transforms PDF documents using the Unstructured API with various processing strategies.
+- **API Document Loader**: Loads and transforms documents using the Unstructured API. Supports extracting text, tables, and images from various document formats.
+- **PDF Document Loader**: Loads and transforms PDF documents with various processing strategies.
+- **Document Chunker**: Chunks documents using configurable strategies, with section-aware chunking as the default for most pipelines.
 
-**UnstructuredChunker**: Chunks documents using different strategies from the `unstructured` library, supporting "basic" and "by_title" chunking approaches.
+Key features:
 
 - Support for multiple document formats (PDF, DOCX, PPTX, etc.).
 - Various processing strategies (hi_res, auto, fast).
 - Configurable chunking with overlap and size parameters.
 - Metadata preservation during document processing.
 - Recursive directory processing for batch document loading.
+
+### BAML
+
+[BAML](https://www.boundaryml.com/) is a domain-specific language for defining LLM interactions. All LLM logic in this project — prompts, input/output schemas, client configurations, and test cases — is written in `.baml` files, fully separated from the Python application code. A Rust-based compiler then generates a typed Python client from these definitions, bridging the two layers.
+
+- **All LLM calls are BAML functions**: Every LLM interaction — answer generation across all six domain pipelines and metadata extraction in the enrichment system — is defined as a typed BAML function with declared inputs, output schema, and prompt template.
+- **Structured output with automatic parsing**: BAML uses Schema-Aligned Parsing to transform raw LLM text into typed objects matching the declared schema. Handles malformed JSON, missing fields, and other common output issues without manual parsing code, working with any model without requiring tool-calling APIs.
+- **Domain-specific prompt templates**: Each pipeline defines its own function with a tailored system prompt and output schema. Medical pipelines emphasize clinical reasoning and safety guidelines; financial pipelines focus on analytical rigor. Prompts use Jinja-like templating with role markers and automatic schema injection.
+- **Multi-provider fallback chain**: Three LLM providers (Groq, Cerebras, SambaNova) are chained with automatic failover - if the primary provider fails, the system transparently retries with the next.
+- **Retry policy**: Built-in exponential backoff with configurable retries for transient failures.
+- **Dynamic type generation at runtime**: The metadata enricher converts user-defined JSON schemas into typed BAML definitions at runtime, so each pipeline can define its own metadata schema in a YAML config.
+- **Co-located test cases**: Each BAML function includes test cases alongside its definition, enabling prompt iteration and regression testing without modifying Python test files.
 
 ## Installation
 
