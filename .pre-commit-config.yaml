@@ -22,7 +22,7 @@ repos:
     - id: check-toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.15.13'
+    rev: 'v0.15.14'
     hooks:
     - id: ruff-check
       args: [--fix, --unsafe-fixes, --exit-non-zero-on-fix]
@@ -40,7 +40,7 @@ repos:
       exclude: '^(src/rag_pipelines/baml_client/|src/rag_pipelines/baml_src/|tests/)'
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.46.2
+    rev: v1
     hooks:
       - id: typos
 
