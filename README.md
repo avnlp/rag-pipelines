@@ -3,9 +3,12 @@
 <div align="center">
 
 [![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/avnlp/rag-pipelines)
-[![code checks](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/code_checks.yml)
-[![tests](https://github.com/avnlp/rag-pipelines/actions/workflows/tests.yml/badge.svg)](https://github.com/avnlp/rag-pipelines/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/github/avnlp/rag-pipelines/graph/badge.svg?token=83MYFZ3UPA)](https://codecov.io/github/avnlp/rag-pipelines)
+[![CI](https://img.shields.io/github/actions/workflow/status/avnlp/rag-pipelines/ci.yml?branch=main&label=CI&logo=githubactions)](https://github.com/avnlp/rag-pipelines/actions/workflows/ci.yml)
+[![Ruff](https://img.shields.io/github/actions/workflow/status/avnlp/rag-pipelines/ci.yml?branch=main&label=Ruff&logo=ruff)](https://github.com/avnlp/rag-pipelines/actions/workflows/ci.yml)
+[![ty](https://img.shields.io/github/actions/workflow/status/avnlp/rag-pipelines/ci.yml?branch=main&label=ty&logo=python)](https://github.com/avnlp/rag-pipelines/actions/workflows/ci.yml)
+[![Bandit](https://img.shields.io/github/actions/workflow/status/avnlp/rag-pipelines/ci.yml?branch=main&label=Bandit&logo=owasp)](https://github.com/avnlp/rag-pipelines/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/avnlp/rag-pipelines/ci.yml?branch=main&label=Tests&logo=pytest)](https://github.com/avnlp/rag-pipelines/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/github/avnlp/rag-pipelines/graph/badge.svg?token=83MYFZ3UPA)](https://codecov.io/github/avnlp/rag-pipelines)
 [![License](https://img.shields.io/github/license/avnlp/rag-pipelines?color=green)](https://github.com/avnlp/rag-pipelines/blob/main/LICENSE)
 
 </div>
