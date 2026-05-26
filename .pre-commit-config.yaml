@@ -43,14 +43,14 @@ repos:
         args: ["-c", "pyproject.toml", "-r", "--severity-level", "high", "--confidence-level", "high", "--exit-zero", "src/"]
         additional_dependencies: ["bandit[toml]"]
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+  - repo: local
     hooks:
-    - id: mypy
-      entry: python3 -m mypy --config-file pyproject.toml
+    - id: ty
+      name: ty
+      entry: uv run ty check src/ tests
       language: system
       types: [python]
-      exclude: '^(src/rag_pipelines/baml_client/|src/rag_pipelines/baml_src/|tests/)'
+      pass_filenames: false
 
   - repo: https://github.com/crate-ci/typos
     rev: v1.46.2
@@ -72,4 +72,4 @@ ci:
   autofix_prs_limit: 5
   autoupdate_schedule: monthly
   autoupdate_commit_msg: "ci: Pre-commit autoupdate"
-  skip: [pytest, mypy]
+  skip: [ty, pytest]

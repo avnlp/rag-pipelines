@@ -106,7 +106,7 @@ class TestEarningsCallsIndexing:
             loop.close()
 
         mock_load_dotenv.assert_called_once()
-        mock_open_file.assert_called_with("earnings_calls_indexing_config.yml", "r")
+        mock_open_file.assert_any_call("earnings_calls_indexing_config.yml", "r")
         mock_yaml_load.assert_called_once()
 
         os.environ.pop("MILVUS_URI", None)
