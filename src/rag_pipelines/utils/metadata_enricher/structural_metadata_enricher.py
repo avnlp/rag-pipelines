@@ -41,7 +41,7 @@ class StructuralMetadataEnricher:
     def __init__(self) -> None:
         """Initialize the structural enricher."""
 
-    @cached(cache=_structural_cache, key=_make_structural_key)  # type: ignore
+    @cached(cache=_structural_cache, key=_make_structural_key)
     async def extract(
         self, chunk: Dict[str, Any], document_context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:

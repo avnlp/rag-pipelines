@@ -111,7 +111,7 @@ class FixedSchemaEnricher:
             if json_type not in baml_type_map:
                 continue
 
-            baml_type = baml_type_map[json_type]
+            baml_type = baml_type_map[json_type]  # type: ignore
 
             # Handle enum fields by generating BAML enum definitions. content_type
             # field uses enums to enforce consistent content classification.

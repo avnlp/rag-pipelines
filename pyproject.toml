@@ -51,7 +51,6 @@ Source = "https://github.com/avnlp/rag-pipelines"
 dev = [
     "bandit>=1.9.4",
     "coverage[toml]>=7.13.0",
-    "mypy>=1.14.1",
     "nbqa>=1.9.1",
     "pip-audit>=2.10.0",
     "pre-commit>=4.5.1",
@@ -62,6 +61,7 @@ dev = [
     "pytest-xdist>=3.8.0",
     "pytest-socket>=0.7.0",
     "ruff>=0.15.13",
+    "ty>=0.0.32",
     "typos>=1.46.2",
 ]
 
@@ -69,34 +69,40 @@ dev = [
 [tool.uv]
 default-groups = ["dev"]
 
-[[tool.mypy.overrides]]
-module = ["datasets", "fsspec"]
-ignore_missing_imports = true
+[tool.ty.environment]
+root = ["src", "tests"]
 
-[tool.mypy]
-follow_imports = "skip"
-ignore_missing_imports = false
-install_types = true
-pretty = true
-non_interactive = true
-allow_untyped_defs = false
-no_implicit_optional = true
-check_untyped_defs = true
-namespace_packages = true
-explicit_package_bases = true
-warn_unused_configs = true
-allow_subclassing_any = false
-allow_untyped_calls = false
-allow_incomplete_defs = false
-allow_untyped_decorators = false
-warn_redundant_casts = true
-warn_unused_ignores = false
-implicit_reexport = false
-strict_equality = true
-extra_checks = true
-mypy_path = "src"
-disable_error_code = ["operator"]
-exclude = ["src/rag_pipelines/baml_client/*", "src/rag_pipelines/baml_src/*"]
+[[tool.ty.overrides]]
+include = ["src/rag_pipelines/baml_client/**", "src/rag_pipelines/baml_src/**"]
+[tool.ty.overrides.rules]
+all = "ignore"
+
+[[tool.ty.overrides]]
+include = ["tests/**"]
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+invalid-return-type = "ignore"
+
+[[tool.ty.overrides]]
+include = ["**/*_rag.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+
+[[tool.ty.overrides]]
+include = ["**/*_indexing.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[tool.ty.overrides]]
+include = ["**"]
+[tool.ty.overrides.rules]
+call-non-callable = "ignore"
+not-subscriptable = "ignore"
 
 [tool.ruff]
 include = ["*.py", "pyproject.toml", "*.ipynb"]

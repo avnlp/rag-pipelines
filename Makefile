@@ -8,7 +8,7 @@ help:
 	@echo "  make test-ci          - Run tests with coverage + XML/junit output for CI"
 	@echo "  make cov-report       - Generate coverage reports (xml, html)"
 	@echo "  make cov              - Run tests and generate coverage reports"
-	@echo "  make lint-typing      - Type check with mypy"
+	@echo "  make lint-typing      - Type check with ty"
 	@echo "  make lint-style       - Lint with ruff (check only)"
 	@echo "  make lint-fmt         - Format code and lint with auto-fixes"
 	@echo "  make lint-check       - Check formatting and lint without modifying files"
@@ -42,7 +42,7 @@ cov-report:
 cov: test-cov cov-report
 
 lint-typing:
-	uv run mypy src/
+	uv run ty check src/ tests
 
 lint-style:
 	uv run ruff check .
@@ -73,4 +73,3 @@ clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .pytest_cache -exec rm -rf {} +
 	find . -type d -name .ruff_cache -exec rm -rf {} +
-	find . -type d -name .mypy_cache -exec rm -rf {} +

@@ -48,7 +48,7 @@ class ContextualReranker:
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path, torch_dtype=self.dtype
-        ).to(self.device)  # type: ignore[arg-type]
+        ).to(self.device)  # type: ignore
         self.model.eval()
 
     def _format_prompts(self, query: str, documents: List[str]) -> List[str]:
