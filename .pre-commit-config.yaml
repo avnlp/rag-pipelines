@@ -53,7 +53,7 @@ repos:
       pass_filenames: false
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1
+    rev: v1.46.3
     hooks:
       - id: typos
 
