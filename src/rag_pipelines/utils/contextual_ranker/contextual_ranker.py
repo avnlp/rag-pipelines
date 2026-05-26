@@ -8,7 +8,7 @@ This component loads the Contextual reranker models from HuggingFace and uses th
 score documents based on their relevance to a given query.
 """
 
-from typing import List
+from typing import Any, List
 
 import torch
 from langchain_core.documents import Document
@@ -41,7 +41,7 @@ class ContextualReranker:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)  # type: ignore[no-untyped-call]
+        self.tokenizer: Any = AutoTokenizer.from_pretrained(model_path, use_fast=True)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.padding_side = "left"
