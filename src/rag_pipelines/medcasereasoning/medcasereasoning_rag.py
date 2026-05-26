@@ -6,7 +6,7 @@ import os
 from typing import Any, Dict, Optional
 
 import yaml
-from datasets import Dataset, load_dataset
+from datasets import load_dataset
 from deepeval import evaluate
 from deepeval.integrations.langchain import CallbackHandler
 from deepeval.metrics import (
@@ -317,7 +317,7 @@ async def main() -> None:
 
     # Load MedCaseReasoning dataset
     logger.info(f"Loading dataset: {dataset_config['path']}")
-    dataset: Dataset = load_dataset(
+    dataset = load_dataset(
         dataset_config["path"],
         split=dataset_config["split"],
     )

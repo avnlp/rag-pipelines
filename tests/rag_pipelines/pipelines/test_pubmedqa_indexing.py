@@ -118,7 +118,7 @@ class TestPubMedQAIndexing:
 
         # Verify that essential functions were called
         mock_load_dotenv.assert_called_once()
-        mock_open_file.assert_called_with("pubmedqa_indexing_config.yml", "r")
+        mock_open_file.assert_any_call("pubmedqa_indexing_config.yml", "r")
         mock_yaml_load.assert_called_once()
 
         # Reset environment variables

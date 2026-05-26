@@ -389,7 +389,7 @@ class MetadataEnricher:
         doc.metadata["enrichment_mode"] = enriched["enrichment_mode"]
         return doc
 
-    @cached(cache=_chunk_cache, key=_make_enrichment_key)  # type: ignore
+    @cached(cache=_chunk_cache, key=_make_enrichment_key)
     async def _enrich_chunk(
         self,
         chunk: Dict[str, Any],
