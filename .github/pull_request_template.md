@@ -1,12 +1,12 @@
-## Summary
+### Summary
 
 <!-- Briefly describe what this PR does and why -->
 
-## Changes
+### Changes
 
 - <!-- List key changes -->
 
-## Checklist
+### Checklist
 
 - [ ] Code follows project style (`make lint-check`)
 - [ ] Type annotations pass (`make lint-typing`)
