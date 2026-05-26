@@ -177,7 +177,7 @@ asyncio_mode = "auto"
     omit=["tests/*", "*__init__.py", "src/rag_pipelines/baml_client/*", "src/rag_pipelines/baml_src/*"]
 
 [tool.bandit]
-exclude_dirs = ["/tests", "/.venv", "/build", "/dist"]
+exclude_dirs = ["tests", ".venv", "build", "dist"]
 skips = ["B101"]
 
 [tool.typos]
