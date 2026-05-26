@@ -6,23 +6,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - .pre-commit-config.yaml
-      - .github/workflows/ci.yml
-      - '**.py'
-      - uv.lock
-      - pyproject.toml
-      - '**.ipynb'
   pull_request:
     branches:
       - main
-    paths:
-      - .pre-commit-config.yaml
-      - .github/workflows/ci.yml
-      - '**.py'
-      - uv.lock
-      - pyproject.toml
-      - '**.ipynb'
   workflow_dispatch:
 
 permissions:
