@@ -60,9 +60,9 @@ dev = [
     "pytest-mock>=3.15.1",
     "pytest-xdist>=3.8.0",
     "pytest-socket>=0.7.0",
-    "ruff>=0.15.20",
+    "ruff>=0.16.4",
     "ty>=0.0.32",
-    "typos>=1.48.0",
+    "typos>=1.49.0",
 ]
 
 # Default dependency groups to be installed
@@ -142,6 +142,7 @@ ignore = [
     "D213", # Multi-line docstring summary should start at the second line
     "PLR2004", # Replace magic number with named constant
     "PLR0913", # Too many arguments
+    "PLR0917", # Too many positional arguments
     "COM812", # Missing trailing comma
     "ERA001", # Found commented-out code (too many false positives with math comments)
     "A001", # Ignore variable `input` is shadowing a Python builtin (common for torch)
