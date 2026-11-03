@@ -62,7 +62,7 @@ dev = [
     "pytest-socket>=0.7.0",
     "ruff>=0.17.3",
     "ty>=0.0.32",
-    "typos>=1.52.0",
+    "typos>=1.51.1",
 ]
 
 # Default dependency groups to be installed
