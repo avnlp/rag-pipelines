@@ -60,9 +60,9 @@ dev = [
     "pytest-mock>=3.15.1",
     "pytest-xdist>=3.8.0",
     "pytest-socket>=0.7.0",
-    "ruff>=0.16.10",
+    "ruff>=0.17.3",
     "ty>=0.0.32",
-    "typos>=1.50.3",
+    "typos>=1.52.0",
 ]
 
 # Default dependency groups to be installed
